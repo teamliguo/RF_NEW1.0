@@ -1,0 +1,24 @@
+Max bias rate: 309.858
+Sum bias rate: -755.315
+MSE:0.0190547
+R2Score:0.808564
+Accuracy of bias < 0.5 : 0.989429
+Accuracy of bias < 1 : 0.999853
+Accuracy of bias < 1.5 : 1
+Accuracy of bias < 2 : 1
+Accuracy of bias < 2.5 : 1
+Accuracy of bias < 3 : 1
+Accuracy of bias < 3.5 : 1
+Accuracy of bias < 4 : 1
+Accuracy of bias < 4.5 : 1
+Accuracy of bias < 5 : 1
+Accuracy of bias rate < 0.01 : 0.609749
+Accuracy of bias rate < 0.02 : 0.616943
+Accuracy of bias rate < 0.03 : 0.622963
+Accuracy of bias rate < 0.04 : 0.629863
+Accuracy of bias rate < 0.05 : 0.636177
+Accuracy of bias rate < 0.06 : 0.642343
+Accuracy of bias rate < 0.07 : 0.648363
+Accuracy of bias rate < 0.08 : 0.654676
+Accuracy of bias rate < 0.09 : 0.659668
+Accuracy of bias rate < 0.1 : 0.663779
