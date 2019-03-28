@@ -92,7 +92,7 @@ float var(const std::vector<float>& vData)
 	float Mean = mean(vData);
 	for (int i = 0; i < vData.size(); i++)
 	{
-		Sum += pow(vData[i] - Mean, 2);
+		Sum += (vData[i] - Mean)*(vData[i] - Mean);
 	}
 	return Sum;
 }
@@ -118,4 +118,32 @@ float samplePearsonCorrelationCoefficient(const std::vector<float>& vDataA, cons
 {
 	_ASSERTE(vDataA.size() == vDataB.size());
 	return (cov(vDataA, vDataB)) / (sqrt(var(vDataA)*var(vDataB)));
+}
+
+//****************************************************************************************************
+//FUNCTION:
+template<class T1, class T2>
+std::vector<T2> calSecondParRange(T1 vMin, T1 vMax, const std::vector<std::pair<T1, T2>>& vData)
+{
+	std::vector<T2> SecondPar;
+	int MinIndex = 0, MaxIndex = 0;
+	for (int k = 0; k < vData.size(); k++)
+	{
+		if (vData[k].first >= vMin)
+		{
+			MinIndex = k;
+			MaxIndex = k;
+			break;
+		}
+	}
+	for (int k = MinIndex; k < vData.size(); k++)
+	{
+		if (vData[k].first <= vMax)
+			MaxIndex = k;
+		else break;
+	}
+	for (int k = MinIndex; k <= MaxIndex; k++)
+		SecondPar.push_back(vData[k].second);
+
+	return SecondPar;
 }

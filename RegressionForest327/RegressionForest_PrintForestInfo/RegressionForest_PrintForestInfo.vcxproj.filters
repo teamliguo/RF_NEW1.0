@@ -93,6 +93,9 @@
     <ClInclude Include="FeatureWeightVIMethod.h">
       <Filter>Weight</Filter>
     </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Forest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Config">

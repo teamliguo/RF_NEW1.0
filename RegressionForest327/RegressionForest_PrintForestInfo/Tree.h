@@ -62,9 +62,12 @@ namespace hiveRegressionForest
 		float traverWithDistanceFromFeaturesCentre(const std::vector<float>& vFeatures);
 		float travelWithMonteCarlo(const std::vector<float>& vFeatures);
 		float computeCDF(float vFirst, float vSecond);
-		void printYRangeWithLeafXRange(const std::string& vFilePath, const CNode* vNode) const;//add-3.21-gss
+		void printYRangeWithLeafXRange(const std::string& vFilePath, const CNode* vNode) const;
+		void printResponseInfoInAABB(const std::vector<float>& vFeatures, const std::string& vFilePath, const CNode* vNode) const; 
 		void calFeatureRangeResponse(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, std::vector<std::pair<float, float>>& voResponseRange, std::vector<float>& voResponseVariance) const;
-	
+		std::vector<std::vector<int>> calFeatureRangeIndex(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, const std::vector<std::vector<float>>& vFeatureSet) const;
+		std::vector<int> calDupIndex(const std::vector<std::vector<int>>& vResponseIndex) const;
+
 	protected:
 		virtual void _selectCandidateFeaturesV(IFeatureSelector* vFeatureSelector, IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsUpdatingFeaturesWeight, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<int>& voCandidateFeaturesIndex);
 		

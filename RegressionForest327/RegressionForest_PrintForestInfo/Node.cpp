@@ -86,9 +86,9 @@ void CNode::outputLeafNodeInfo(const std::string & vFilePath) const
 {
 	if (isLeafNode())
 	{
-		std::pair<std::vector<std::vector<float>>, std::vector<float>> BootstrapDataset = getBootstrapDataset();
-		std::vector<std::vector<float>> FeatureSet = BootstrapDataset.first;
-		std::vector<float> ResponseSet = BootstrapDataset.second;
+		std::pair<std::vector<std::vector<float>>, std::vector<float>>& BootstrapDataset = getBootstrapDataset();
+		std::vector<std::vector<float>>& FeatureSet = BootstrapDataset.first;
+		std::vector<float>& ResponseSet = BootstrapDataset.second;
 		_ASSERT(FeatureSet.size() == ResponseSet.size() && FeatureSet.size() != 0);
 		int DataNum = FeatureSet.size(), FeatureNum = FeatureSet[0].size();
 		std::ofstream PrintFile;

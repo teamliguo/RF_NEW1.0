@@ -26,7 +26,7 @@ namespace hiveRegressionForest
 		void	outputForestInfo(const std::string& vOutputFileName) const;
 		void	outputOOBInfo(const std::string& vOutputFileName) const;
 		void    outputPathNodeInfo(const std::string& vOutputFileName, const std::vector<SPathNodeInfo>& vPathNodeInfo) const;
-		void    printAllInfo(const std::vector<std::pair<int, float>>& voPredictBias, const std::vector<const CNode*>& vLeafNodeSet, const std::vector<std::vector<SPathNodeInfo>>& vAllTreePath, const std::vector<std::vector<float>>& vOutRange, const std::vector<std::vector<float>>& vOutSplitRange) const;
+		void    printAllInfo(const std::vector<float>& vFeatures, const std::vector<std::pair<int, float>>& voPredictBias, const std::vector<const CNode*>& vLeafNodeSet, const std::vector<std::vector<SPathNodeInfo>>& vAllTreePath, const std::vector<std::vector<float>>& vOutRange, const std::vector<std::vector<float>>& vOutSplitRange) const;
 		void    outputOutFeatureRange(const std::string& vOutputFileName, const std::vector<float>& vOutRange) const;
 
 		float   predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction) const;

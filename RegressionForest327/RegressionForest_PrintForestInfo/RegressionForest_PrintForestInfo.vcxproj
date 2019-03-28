@@ -186,6 +186,7 @@
     <ClInclude Include="Tree.h" />
     <ClInclude Include="UniformBootstrapSelector.h" />
     <ClInclude Include="UniformFeatureSelector.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="WeightedBootstrapSelector.h" />
     <ClInclude Include="WeightedFeatureSelector.h" />
   </ItemGroup>

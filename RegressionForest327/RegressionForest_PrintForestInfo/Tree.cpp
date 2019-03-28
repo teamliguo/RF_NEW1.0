@@ -6,6 +6,7 @@
 #include <boost/format.hpp>
 #include <algorithm>
 #include <fstream>
+#include <unordered_map>
 #include "common/HiveCommonMicro.h"
 #include "common/ProductFactoryData.h"
 #include "math/RandomInterface.h"
@@ -17,6 +18,7 @@
 #include "ObjectPool.h"
 #include "SingleResponseNode.h"
 #include "MultiResponseNode.h"
+#include "Utility.h"
 
 using namespace hiveRegressionForest;
 
@@ -587,22 +589,69 @@ float CTree::computeCDF(float vFirst, float vSecond)
 //FUNCTION:
 void CTree::printYRangeWithLeafXRange(const std::string& vFilePath, const CNode* vNode) const
 {
-	std::ofstream PrintFile;
-	PrintFile.open(vFilePath, std::ios::app);
+	std::ofstream PrintFile(vFilePath, std::ios::app);
 	if (PrintFile.is_open())
 	{
-		std::pair<std::vector<float>, std::vector<float>> FeatureRange = vNode->getFeatureRange();
-		std::vector<float> ResponseVariance;
-		std::vector<std::pair<float, float>> ResponseRange;
-		calFeatureRangeResponse(FeatureRange, ResponseRange, ResponseVariance);
+		std::pair<std::vector<float>, std::vector<float>>& FeatureRange = vNode->getFeatureRange();
+		std::pair<std::vector<float>, std::vector<float>>& SplitFeatureRange = vNode->getFeatureSplitRange();
+		std::vector<float> ResponseVar, SplitRangeVar;
+		std::vector<std::pair<float, float>> ResponseRange, SplitResponseRange;
+		calFeatureRangeResponse(FeatureRange, ResponseRange, ResponseVar);
+		calFeatureRangeResponse(SplitFeatureRange, SplitResponseRange, SplitRangeVar);
 		PrintFile << "Y-Range" << ",";
 		for (int i = 0; i < FeatureRange.first.size(); i++)
 			PrintFile << ResponseRange[i].first << "~" << ResponseRange[i].second << ",";
 		PrintFile << std::endl;
 		PrintFile << "Y-Var" << ",";
 		for (int i = 0; i < FeatureRange.first.size(); i++)
-			PrintFile << ResponseVariance[i] << ",";
+			PrintFile << ResponseVar[i] << ",";
 		PrintFile << std::endl;
+		PrintFile << "Y-Range-inSplit" << ",";
+		for (int i = 0; i < SplitFeatureRange.first.size(); i++)
+			PrintFile << SplitResponseRange[i].first << "~" << SplitResponseRange[i].second << ",";
+		PrintFile << std::endl;
+		PrintFile << "Y-Var-inSplit" << ",";
+		for (int i = 0; i < SplitFeatureRange.first.size(); i++)
+			PrintFile << SplitRangeVar[i] << ",";
+		PrintFile << std::endl;
+		PrintFile << "Y-Num:" << "," << ResponseVar.size() << "," << SplitRangeVar.size() << std::endl;
+	}
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CTree::printResponseInfoInAABB(const std::vector<float>& vFeatures, const std::string & vFilePath, const CNode * vNode) const
+{
+	std::ofstream PrintFile(vFilePath, std::ios::app);
+	if (PrintFile.is_open())
+	{
+		std::vector<int> TreeBootstrapIndex = getBootstrapIndex();
+		std::pair<std::vector<std::vector<float>>, std::vector<float>> TreeBootstrapDataset;
+		CTrainingSet::getInstance()->recombineBootstrapDataset(TreeBootstrapIndex, std::make_pair(0, TreeBootstrapIndex.size()), TreeBootstrapDataset);
+		std::pair<std::vector<float>, std::vector<float>> FeatureRange;
+		std::vector<std::vector<float>>& Dataset = vNode->getBootstrapDataset().first;
+		for (int i = 0; i < vFeatures.size(); i++)
+		{
+			FeatureRange.first.push_back(std::min(vFeatures[i], Dataset[0][i]));
+			FeatureRange.second.push_back(std::max(vFeatures[i], Dataset[0][i]));
+		}
+		std::vector<int>& ResponseIndex = calDupIndex(calFeatureRangeIndex(FeatureRange, TreeBootstrapDataset.first));
+		if (ResponseIndex.size() == 0)
+			PrintFile << "NO DUP DATA" << std::endl;
+		else
+		{
+			std::vector<float> ResponseSet;
+			for (int i = 0; i < ResponseIndex.size(); i++)
+			{
+				ResponseSet.push_back(TreeBootstrapDataset.second[ResponseIndex[i]]);
+				for (int k = 0; k < vFeatures.size(); k++)
+					std::cout << TreeBootstrapDataset.first[ResponseIndex[i]][k] << ", ";
+				std::cout << std::endl;
+			}
+			float ResponseVar = var(ResponseSet) / ResponseSet.size();
+			std::cout << ResponseVar << std::endl;
+			PrintFile << "Num:" << "," << ResponseSet.size() << "," << "Var:" << "," << ResponseVar << std::endl;
+		}
 	}
 }
 
@@ -613,51 +662,71 @@ void CTree::calFeatureRangeResponse(const std::pair<std::vector<float>, std::vec
 	std::vector<int> TreeBootstrapIndex = getBootstrapIndex();//树的训练集索引
 	std::pair<std::vector<std::vector<float>>, std::vector<float>> TreeBootstrapDataset;
 	CTrainingSet::getInstance()->recombineBootstrapDataset(TreeBootstrapIndex, std::make_pair(0, TreeBootstrapIndex.size()), TreeBootstrapDataset);//树的训练集的特征与数据集，
-	std::vector<std::vector<float>> TreeFeatureSet = TreeBootstrapDataset.first;
-	std::vector<float> TreeResponseSet = TreeBootstrapDataset.second;
-	int FeatureNum = TreeFeatureSet[0].size();
-	std::vector<std::vector<std::pair<float, float>>> SortedFeatureResponse;
-	for (int i = 0; i < FeatureNum; i++)
+	std::vector<std::vector<float>>& TreeFeatureSet = TreeBootstrapDataset.first;
+	std::vector<float>& TreeResponseSet = TreeBootstrapDataset.second;
+	std::vector<std::pair<float, float>> TempInstance;
+	std::vector<float> InterResponse;
+
+	for (int i = 0; i < TreeFeatureSet[0].size(); i++)
 	{
-		std::vector<std::pair<float, float>> TempInstance;
 		for (int k = 0; k < TreeFeatureSet.size(); k++)
 			TempInstance.push_back(std::make_pair(TreeFeatureSet[k][i], TreeResponseSet[k]));
 		sort(TempInstance.begin(), TempInstance.end(), [](std::pair<float, float> &vFirst, std::pair<float, float> &vSecond) {return vFirst.first < vSecond.first; });
-		SortedFeatureResponse.push_back(TempInstance);
-	}
-	for (int i = 0; i < FeatureNum; i++)
-	{
-		float MinX = vLeafNodeFeatureRange.first[i], MaxX = vLeafNodeFeatureRange.second[i];
-		int MinIndex, MaxIndex;
-		for (int k = 0; k < TreeFeatureSet.size(); k++)
-		{
-			if (SortedFeatureResponse[i][k].first >= MinX)
-			{
-				MinIndex = k;
-				MaxIndex = k;
-				break;
-			}
-		}
-		for (int k = MinIndex; k < TreeFeatureSet.size(); k++)
-		{
-			if (SortedFeatureResponse[i][k].first >= MaxX)
-			{
-				MaxIndex = k;
-				break;
-			}
-		}
-		std::vector<float> TempResponse;
-		for (int k = MinIndex; k <= MaxIndex; k++)
-			TempResponse.push_back(SortedFeatureResponse[i][k].second);
-		_ASSERTE(TempResponse.size() > 0);
-		float MinResponse = *std::min_element(TempResponse.begin(), TempResponse.end());
-		float MaxResponse = *std::max_element(TempResponse.begin(), TempResponse.end());
-		voResponseRange.push_back(std::make_pair(MinResponse, MaxResponse));
 
-		float ResponseVar = 0.f, ResponseMean = std::accumulate(TempResponse.begin(), TempResponse.end(), 0.f) / TempResponse.size();
-		for (int k = 0; k < TempResponse.size(); k++)
-			ResponseVar += (TempResponse[k] - ResponseMean)*(TempResponse[k] - ResponseMean);
-		voResponseVariance.push_back(ResponseVar / TempResponse.size());
+		float MinX = vLeafNodeFeatureRange.first[i], MaxX = vLeafNodeFeatureRange.second[i];
+		InterResponse = calSecondParRange(MinX, MaxX, TempInstance);
+		float MinResponse = *std::min_element(InterResponse.begin(), InterResponse.end());
+		float MaxResponse = *std::max_element(InterResponse.begin(), InterResponse.end());
+		voResponseRange.push_back(std::make_pair(MinResponse, MaxResponse));
+		float ResponseVar = var(InterResponse);
+		voResponseVariance.push_back(ResponseVar / InterResponse.size());
+
+		InterResponse.clear();
+		TempInstance.clear();
 	}
 }
 
+//****************************************************************************************************
+//FUNCTION:
+std::vector<std::vector<int>> CTree::calFeatureRangeIndex(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, const std::vector<std::vector<float>>& vFeatureSet) const
+{
+	int FeatureNum = vLeafNodeFeatureRange.first.size();
+	std::vector<std::pair<float, int>> TempFeatureIndex;
+	std::vector<std::vector<int>> ResponseIndex(FeatureNum);
+
+	for (int i = 0; i < FeatureNum; i++)
+	{
+		for (int k = 0; k < vFeatureSet.size(); k++)
+		{
+			TempFeatureIndex.push_back(std::make_pair(vFeatureSet[k][i], k));
+		}
+		sort(TempFeatureIndex.begin(), TempFeatureIndex.end(), [](std::pair<float, int> &vFirst, std::pair<float, int>& vSecond) {return vFirst.first < vSecond.first; });
+		float MinX = vLeafNodeFeatureRange.first[i], MaxX = vLeafNodeFeatureRange.second[i];
+		ResponseIndex[i] = calSecondParRange(MinX, MaxX, TempFeatureIndex);
+		TempFeatureIndex.clear();
+	}
+	return ResponseIndex;
+}
+
+//****************************************************************************************************
+//FUNCTION:
+std::vector<int> CTree::calDupIndex(const std::vector<std::vector<int>>& vResponseIndex) const
+{
+	std::vector<int> Index;
+	std::unordered_map<int, int> DupIndex;
+	for (int i = 0; i < vResponseIndex[0].size(); i++)
+		DupIndex[vResponseIndex[0][i]] = 1;
+	for (int i = 1; i < vResponseIndex.size(); i++)
+	{
+		for (int k = 0; k < vResponseIndex[i].size(); k++)
+		{
+			if (DupIndex.find(vResponseIndex[i][k]) != DupIndex.end())
+				DupIndex[vResponseIndex[i][k]]++;
+		}
+	}
+	for (auto it = DupIndex.begin(); it != DupIndex.end(); it++)
+		if ((*it).second == vResponseIndex.size())
+			Index.push_back((*it).first);
+	//if (Index.size() == 0) return std::vector<int>();
+	return Index;
+}

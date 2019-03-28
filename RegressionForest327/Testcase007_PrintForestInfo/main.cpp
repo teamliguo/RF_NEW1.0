@@ -138,7 +138,7 @@ void main()
 			int PrintDataSize = CTrainingSetConfig::getInstance()->getAttribute<int>(hiveRegressionForest::KEY_WORDS::NEW_FILE_DATA_SIZE);
 			_ASSERTE(PrintDataSize <= BiasRateIndex.size());
 
-			for (int i = 2000; i < 2000 + PrintDataSize; i++)
+			for (int i = 0; i < PrintDataSize; i++)
 			{
 				int FrontIndex = BiasRateIndex[i].first;
 				int LastIndex = BiasRateIndex[BiasRateIndex.size() - 1 - i].first;

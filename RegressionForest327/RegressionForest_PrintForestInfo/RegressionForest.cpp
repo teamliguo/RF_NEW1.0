@@ -3,6 +3,7 @@
 #include <numeric>
 #include <fstream>
 #include <algorithm>
+#include <map>
 #include "common/CommonInterface.h"
 #include "common/ConfigParser.h"
 #include "common/HiveCommonMicro.h"
@@ -13,7 +14,6 @@
 #include "BaseInstanceWeightMethod.h"
 #include "RegressionForestConfig.h"
 #include "RegressionForestCommon.h"
-#include <map>
 
 using namespace hiveRegressionForest;
 
@@ -235,7 +235,7 @@ float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFea
 	if (IsPrint)
 	{
 		sort(PredictBias.begin(), PredictBias.end(), [](std::pair<int, float>& vFirst, std::pair<int, float>& vSecond) {return vFirst.second < vSecond.second; });
-		printAllInfo(PredictBias, LeafNodeSet, AllTreePath, OutLeafFeatureRange, OutLeafFeatureSplitRange);
+		printAllInfo(vFeatures, PredictBias, LeafNodeSet, AllTreePath, OutLeafFeatureRange, OutLeafFeatureSplitRange);
 	}
 	_ASSERTE(PredictValueOfTree.size() == NodeWeight.size());
 	if (vIsWeightedPrediction)
@@ -362,7 +362,7 @@ void CRegressionForest::outputPathNodeInfo(const std::string& vOutputFileName, c
 
 //******************************************************************************
 //FUNCTION:
-void CRegressionForest::printAllInfo(const std::vector<std::pair<int, float>>& voPredictBias, const std::vector<const CNode*>& vLeafNodeSet, const std::vector<std::vector<SPathNodeInfo>>& vAllTreePath, const std::vector<std::vector<float>>& vOutRange, const std::vector<std::vector<float>>& vOutSplitRange) const
+void CRegressionForest::printAllInfo(const std::vector<float>& vFeatures, const std::vector<std::pair<int, float>>& vPredictBias, const std::vector<const CNode*>& vLeafNodeSet, const std::vector<std::vector<SPathNodeInfo>>& vAllTreePath, const std::vector<std::vector<float>>& vOutRange, const std::vector<std::vector<float>>& vOutSplitRange) const
 {
 	std::string BestTreeFilePath = CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BEST_TREE_PATH);
 	std::string BadTreeFilePath = CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BAD_TREE_PATH);
@@ -370,25 +370,27 @@ void CRegressionForest::printAllInfo(const std::vector<std::pair<int, float>>& v
 	std::ofstream BadTreeFile;
 	BestTreeFile.open(BestTreeFilePath, std::ios::app);
 	BadTreeFile.open(BadTreeFilePath, std::ios::app);
-	int NumOfUsingTrees = voPredictBias.size();
+	int NumOfUsingTrees = vPredictBias.size();
 	int PrintNum = CTrainingSetConfig::getInstance()->getAttribute<int>(hiveRegressionForest::KEY_WORDS::PRINT_TREE_NUMBER);
-	_ASSERTE(PrintNum <= vNumOfUsingTrees);
+	_ASSERTE(PrintNum <= NumOfUsingTrees);
 	for (int i = 0; i < PrintNum; i++)
 	{
-		int BestTreeIndex = voPredictBias[i].first;
-		int BadTreeIndex = voPredictBias[NumOfUsingTrees - 1 - i].first;
+		int BestTreeIndex = vPredictBias[i].first;
+		int BadTreeIndex = vPredictBias[NumOfUsingTrees - 1 - i].first;
 		BestTreeFile << "Tree" << BestTreeIndex << std::endl;
 		BadTreeFile << "Tree" << BadTreeIndex << std::endl;
 		vLeafNodeSet[BestTreeIndex]->outputLeafNodeInfo(BestTreeFilePath);
 		m_Trees[BestTreeIndex]->printYRangeWithLeafXRange(BestTreeFilePath, vLeafNodeSet[BestTreeIndex]);
 		outputPathNodeInfo(BestTreeFilePath, vAllTreePath[BestTreeIndex]);
-		outputOutFeatureRange(BestTreeFilePath, vOutRange[BestTreeIndex]);
 		outputOutFeatureRange(BestTreeFilePath, vOutSplitRange[BestTreeIndex]);
+		outputOutFeatureRange(BestTreeFilePath, vOutRange[BestTreeIndex]);
+		m_Trees[BestTreeIndex]->printResponseInfoInAABB(vFeatures, BestTreeFilePath, vLeafNodeSet[BestTreeIndex]);
 		vLeafNodeSet[BadTreeIndex]->outputLeafNodeInfo(BadTreeFilePath);
 		m_Trees[BadTreeIndex]->printYRangeWithLeafXRange(BadTreeFilePath, vLeafNodeSet[BadTreeIndex]);
 		outputPathNodeInfo(BadTreeFilePath, vAllTreePath[BadTreeIndex]);
-		outputOutFeatureRange(BadTreeFilePath, vOutRange[BadTreeIndex]);
 		outputOutFeatureRange(BadTreeFilePath, vOutSplitRange[BadTreeIndex]);
+		outputOutFeatureRange(BadTreeFilePath, vOutRange[BadTreeIndex]);
+		m_Trees[BadTreeIndex]->printResponseInfoInAABB(vFeatures, BadTreeFilePath, vLeafNodeSet[BadTreeIndex]);
 	}
 	BestTreeFile << std::endl;
 	BadTreeFile << std::endl;
