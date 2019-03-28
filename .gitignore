@@ -44,5 +44,6 @@
 **/Model
 **/DataSet
 *.VC.db
+*.VC.VC.opendb
 *.sdf
 *.opensdf
