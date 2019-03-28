@@ -38,7 +38,11 @@
 *.user
 **/.vs
 **/.svn
-
+**/x64
+**/Debug
+**/Release
+**/Model
+**/DataSet
 *.VC.db
 *.sdf
 *.opensdf
