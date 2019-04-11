@@ -16,11 +16,13 @@ namespace hiveRegressionForest
 		~CNode();
 
 		virtual void createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) {}
-		
+		virtual void createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, const std::vector<int>& vDataSetIndex, const std::pair<int, int>& vIndexRange) {}
+
 		//NOTES : 此处使用默认参数vResponseIndex以满足单响应和多响应的需求
 		virtual float predictV(const std::vector<float>& vFeatureInstance, unsigned int vResponseIndex = 0) const { return FLT_MAX; }
 		virtual float getNodeMeanV(unsigned int vResponseIndex = 0) const { return FLT_MAX; } //11.27-gss
 		virtual float getNodeVarianceV(unsigned int vResponseIndex = 0) const { return FLT_MAX; }
+		virtual std::vector<int> getNodeDataIndexV()const { return std::vector<int>(); };
 		virtual void  calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) {}; //11.28-gss
 		float         calculateNodeWeight(unsigned int vResponseIndex = 0) const;
 

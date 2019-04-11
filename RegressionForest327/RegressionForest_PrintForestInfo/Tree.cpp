@@ -18,6 +18,7 @@
 #include "ObjectPool.h"
 #include "SingleResponseNode.h"
 #include "MultiResponseNode.h"
+#include "MpCompute.h"
 #include "Utility.h"
 
 using namespace hiveRegressionForest;
@@ -55,6 +56,7 @@ void CTree::buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* 
 	m_pRoot->calStatisticsV(BootstrapDataset);
 	m_pRoot->setSubEachFeatureSplitRange(m_pRoot->getFeatureRange());
 	setBootstrapIndex(BootstrapIndex);
+	__sortFeatureResponsePairSet();
 	int RangeSplitPos = 0;
 	bool IsUpdatingFeaturesWeight = CRegressionForestConfig::getInstance()->getAttribute<bool>(KEY_WORDS::LIVE_UPDATE_FEATURES_WEIGHT);
 	std::vector<int> CurrFeatureIndexSubSet;
@@ -72,7 +74,7 @@ void CTree::buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* 
 		_ASSERTE(vTerminateCondition);
 		if (vTerminateCondition->isMeetTerminateConditionV(BootstrapDataset.first, BootstrapDataset.second, __getTerminateConditionExtraParameter(pCurNode)))
 		{
-			__createLeafNode(pCurNode, CurBootstrapRange, BootstrapDataset);
+			__createLeafNode(pCurNode, BootstrapIndex, CurBootstrapRange, BootstrapDataset);
 		}
 		else
 		{
@@ -97,7 +99,7 @@ void CTree::buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* 
 			}
 			else
 			{
-				__createLeafNode(pCurNode, CurBootstrapRange, BootstrapDataset);
+				__createLeafNode(pCurNode, BootstrapIndex, CurBootstrapRange, BootstrapDataset);
 			}
 		}
 	}
@@ -170,9 +172,9 @@ CNode* CTree::__createNode(unsigned int vLevel)
 
 //****************************************************************************************************
 //FUNCTION:
-void CTree::__createLeafNode(CNode* vCurNode, const std::pair<int, int>& vRange, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset)
+void CTree::__createLeafNode(CNode* vCurNode, const std::vector<int>& vDataSetIndex, const std::pair<int, int>& vRange, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset)
 {
-	vCurNode->createAsLeafNodeV(vBootstrapDataset);
+	vCurNode->createAsLeafNodeV(vBootstrapDataset, vDataSetIndex, vRange);
 	vCurNode->setNodeSize(vRange.second - vRange.first);
 }
 
@@ -274,6 +276,23 @@ void CTree::__updateFeaturesWeight(IFeatureWeightGenerator* vFeatureWeightMethod
 	std::for_each(VariableImportanceSortedList.begin(), VariableImportanceSortedList.end(), [&](const std::pair<unsigned int, float> &vVariableImportance) { voFeaturesWeight[vVariableImportance.first] = vVariableImportance.second; });
 	std::cout << voFeaturesWeight.size() << std::endl;
 	_ASSERTE(!voFeaturesWeight.empty());
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CTree::__sortFeatureResponsePairSet()
+{
+	std::pair<std::vector<std::vector<float>>, std::vector<float>> BootstrapDataset;
+	CTrainingSet::getInstance()->recombineBootstrapDataset(m_BootstrapIndex, std::make_pair(0, m_BootstrapIndex.size()), BootstrapDataset);
+	std::vector<std::vector<float>>& FeatureSet = BootstrapDataset.first;
+	std::vector<float>& ResponseSet = BootstrapDataset.second;
+	m_SortedFeatureResponsePairSet.resize(FeatureSet[0].size());
+	CMpCompute* pMpCompute = nullptr;
+	for (int i = 0; i < FeatureSet[0].size(); ++i)
+	{
+		pMpCompute->generateSortedFeatureResponsePairSet(FeatureSet, ResponseSet, i, m_SortedFeatureResponsePairSet[i]);
+	}
+	_SAFE_DELETE(pMpCompute);
 }
 
 //****************************************************************************************************
@@ -587,34 +606,74 @@ float CTree::computeCDF(float vFirst, float vSecond)
 
 //****************************************************************************************************
 //FUNCTION:
-void CTree::printYRangeWithLeafXRange(const std::string& vFilePath, const CNode* vNode) const
+void CTree::printYRangeWithLeafXRange(const std::vector<float>& vFeatures, const std::string& vFilePath, const CNode* vNode) const
 {
 	std::ofstream PrintFile(vFilePath, std::ios::app);
 	if (PrintFile.is_open())
 	{
 		std::pair<std::vector<float>, std::vector<float>>& FeatureRange = vNode->getFeatureRange();
 		std::pair<std::vector<float>, std::vector<float>>& SplitFeatureRange = vNode->getFeatureSplitRange();
-		std::vector<float> ResponseVar, SplitRangeVar;
-		std::vector<std::pair<float, float>> ResponseRange, SplitResponseRange;
-		calFeatureRangeResponse(FeatureRange, ResponseRange, ResponseVar);
-		calFeatureRangeResponse(SplitFeatureRange, SplitResponseRange, SplitRangeVar);
-		PrintFile << "Y-Range" << ",";
-		for (int i = 0; i < FeatureRange.first.size(); i++)
+		std::pair<std::vector<float>, std::vector<float>> OutRange;
+		std::vector<float> ResponseVar, SplitRangeVar, OutSplitRangeVar;
+		std::vector<std::pair<float, float>> ResponseRange, SplitResponseRange, OutResponseRange;
+		int FeatureNum = vFeatures.size();
+		for (int i = 0; i < FeatureNum; i++)
+		{
+			if (vFeatures[i] < FeatureRange.first[i])
+			{
+				OutRange.first.push_back(vFeatures[i]);
+				OutRange.second.push_back(FeatureRange.second[i]);
+			}
+			else if (vFeatures[i] > FeatureRange.second[i])
+			{
+				OutRange.first.push_back(FeatureRange.first[i]);
+				OutRange.second.push_back(vFeatures[i]);
+			}
+			else
+			{
+				OutRange.first.push_back(vFeatures[i]);
+				OutRange.second.push_back(vFeatures[i]);
+			}
+		}
+		std::vector<int> OutRangeNum = calFeatureRangeResponse(OutRange, OutResponseRange, OutSplitRangeVar);
+		std::vector<int> FeatureRangeNum = calFeatureRangeResponse(FeatureRange, ResponseRange, ResponseVar);
+		std::vector<int> SplitFeatureRangeNum = calFeatureRangeResponse(SplitFeatureRange, SplitResponseRange, SplitRangeVar);
+		PrintFile << "Y-Feature-Range" << ",";
+		for (int i = 0; i < FeatureNum; i++)
 			PrintFile << ResponseRange[i].first << "~" << ResponseRange[i].second << ",";
 		PrintFile << std::endl;
-		PrintFile << "Y-Var" << ",";
-		for (int i = 0; i < FeatureRange.first.size(); i++)
+		PrintFile << "Y-Feature-Var" << ",";
+		for (int i = 0; i < FeatureNum; i++)
 			PrintFile << ResponseVar[i] << ",";
 		PrintFile << std::endl;
-		PrintFile << "Y-Range-inSplit" << ",";
-		for (int i = 0; i < SplitFeatureRange.first.size(); i++)
+		PrintFile << "Y-Split-Range" << ",";
+		for (int i = 0; i < FeatureNum; i++)
 			PrintFile << SplitResponseRange[i].first << "~" << SplitResponseRange[i].second << ",";
 		PrintFile << std::endl;
-		PrintFile << "Y-Var-inSplit" << ",";
-		for (int i = 0; i < SplitFeatureRange.first.size(); i++)
+		PrintFile << "Y-Split-Var" << ",";
+		for (int i = 0; i < FeatureNum; i++)
 			PrintFile << SplitRangeVar[i] << ",";
 		PrintFile << std::endl;
-		PrintFile << "Y-Num:" << "," << ResponseVar.size() << "," << SplitRangeVar.size() << std::endl;
+		PrintFile << "Y-Out-Range" << ",";
+		for (int i = 0; i < FeatureNum; i++)
+			PrintFile << OutResponseRange[i].first << "~" << OutResponseRange[i].second << ",";
+		PrintFile << std::endl;
+		PrintFile << "Y-Out-Var" << ",";
+		for (int i = 0; i < FeatureNum; i++)
+			PrintFile << OutSplitRangeVar[i] << ",";
+		PrintFile << std::endl;
+		/*PrintFile << "Y-Num-Feature-Range:" << ",";
+		for (int i = 0; i < FeatureNum; i++)
+			PrintFile << FeatureRangeNum[i] << ",";
+		PrintFile << std::endl;*/
+		/*PrintFile << "Y-Num-Split-Range:" << ",";
+		for (int i = 0; i < FeatureNum; i++)
+			PrintFile << SplitFeatureRangeNum[i] << ",";
+		PrintFile << std::endl;
+		PrintFile << "Y-Num-Out-Range:" << ",";
+		for (int i = 0; i < FeatureNum; i++)
+			PrintFile << OutRangeNum[i] << ",";
+		PrintFile << std::endl;*/
 	}
 }
 
@@ -657,33 +716,25 @@ void CTree::printResponseInfoInAABB(const std::vector<float>& vFeatures, const s
 
 //******************************************************************************
 //FUNCTION:
-void CTree::calFeatureRangeResponse(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, std::vector<std::pair<float, float>>& voResponseRange, std::vector<float>& voResponseVariance) const
+std::vector<int> CTree::calFeatureRangeResponse(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, std::vector<std::pair<float, float>>& voResponseRange, std::vector<float>& voResponseVariance) const
 {
-	std::vector<int> TreeBootstrapIndex = getBootstrapIndex();//树的训练集索引
-	std::pair<std::vector<std::vector<float>>, std::vector<float>> TreeBootstrapDataset;
-	CTrainingSet::getInstance()->recombineBootstrapDataset(TreeBootstrapIndex, std::make_pair(0, TreeBootstrapIndex.size()), TreeBootstrapDataset);//树的训练集的特征与数据集，
-	std::vector<std::vector<float>>& TreeFeatureSet = TreeBootstrapDataset.first;
-	std::vector<float>& TreeResponseSet = TreeBootstrapDataset.second;
-	std::vector<std::pair<float, float>> TempInstance;
 	std::vector<float> InterResponse;
+	std::vector<int> InterResponseNum;
 
-	for (int i = 0; i < TreeFeatureSet[0].size(); i++)
+	for (int i = 0; i < vLeafNodeFeatureRange.first.size(); i++)
 	{
-		for (int k = 0; k < TreeFeatureSet.size(); k++)
-			TempInstance.push_back(std::make_pair(TreeFeatureSet[k][i], TreeResponseSet[k]));
-		sort(TempInstance.begin(), TempInstance.end(), [](std::pair<float, float> &vFirst, std::pair<float, float> &vSecond) {return vFirst.first < vSecond.first; });
-
 		float MinX = vLeafNodeFeatureRange.first[i], MaxX = vLeafNodeFeatureRange.second[i];
-		InterResponse = calSecondParRange(MinX, MaxX, TempInstance);
+		InterResponse = calSecondParRange(MinX, MaxX, m_SortedFeatureResponsePairSet[i]);
 		float MinResponse = *std::min_element(InterResponse.begin(), InterResponse.end());
 		float MaxResponse = *std::max_element(InterResponse.begin(), InterResponse.end());
 		voResponseRange.push_back(std::make_pair(MinResponse, MaxResponse));
 		float ResponseVar = var(InterResponse);
 		voResponseVariance.push_back(ResponseVar / InterResponse.size());
+		InterResponseNum.push_back(InterResponse.size());
 
 		InterResponse.clear();
-		TempInstance.clear();
 	}
+	return InterResponseNum;
 }
 
 //****************************************************************************************************
@@ -727,6 +778,5 @@ std::vector<int> CTree::calDupIndex(const std::vector<std::vector<int>>& vRespon
 	for (auto it = DupIndex.begin(); it != DupIndex.end(); it++)
 		if ((*it).second == vResponseIndex.size())
 			Index.push_back((*it).first);
-	//if (Index.size() == 0) return std::vector<int>();
 	return Index;
 }

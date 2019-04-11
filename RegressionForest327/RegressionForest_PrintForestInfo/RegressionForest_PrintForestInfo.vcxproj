@@ -162,6 +162,7 @@
     <ClInclude Include="BaseTerminateCondition.h" />
     <ClInclude Include="BasicCondition.h" />
     <ClInclude Include="FeatureWeightVIMethod.h" />
+    <ClInclude Include="MpCompute.h" />
     <ClInclude Include="MultiInfoGainSplit.h" />
     <ClInclude Include="MultiResponseNode.h" />
     <ClInclude Include="EarlyFittingCondition.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Utility.h" />
     <ClInclude Include="WeightedBootstrapSelector.h" />
     <ClInclude Include="WeightedFeatureSelector.h" />
+    <ClInclude Include="WeightedPathNodeMethod.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseFeatureSelector.cpp" />
@@ -200,6 +202,7 @@
     <ClCompile Include="FeatureWeightRSSMethod.cpp" />
     <ClCompile Include="FeatureWeightVIMethod.cpp" />
     <ClCompile Include="InstanceWeightResponseMethod.cpp" />
+    <ClCompile Include="MpCompute.cpp" />
     <ClCompile Include="MultiInfoGainSplit.cpp" />
     <ClCompile Include="MultiResponseNode.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -215,8 +218,10 @@
     <ClCompile Include="Tree.cpp" />
     <ClCompile Include="UniformBootstrapSelector.cpp" />
     <ClCompile Include="UniformFeatureSelector.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="WeightedBootstrapSelector.cpp" />
     <ClCompile Include="WeightedFeatureSelector.cpp" />
+    <ClCompile Include="WeightedPathNodeMethod.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

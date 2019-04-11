@@ -49,9 +49,9 @@ namespace hiveRegressionForest
 		void fetchTreeInfo(STreeInfo& voTreeInfo) const;
 		const CNode& getRoot() const { return *m_pRoot; }
 		const std::vector<int>& getOOBIndexSet() const { _ASSERTE(!m_OOBIndexSet.empty()); return m_OOBIndexSet; }
-		std::pair<std::vector<std::vector<float>>, std::vector<float>> getBootstrapDataset() { return m_BootstrapDataset; }
 		void setBootstrapIndex(std::vector<int>& vBootstrapIndex) { m_BootstrapIndex = vBootstrapIndex; }
 		const std::vector<int> getBootstrapIndex() const { return m_BootstrapIndex; }
+		const std::vector<std::vector<std::pair<float, float>>> getSortedFeatureResponsePairSet() const { return m_SortedFeatureResponsePairSet; }
 
 		bool operator==(const CTree& vTree) const;
 
@@ -62,9 +62,9 @@ namespace hiveRegressionForest
 		float traverWithDistanceFromFeaturesCentre(const std::vector<float>& vFeatures);
 		float travelWithMonteCarlo(const std::vector<float>& vFeatures);
 		float computeCDF(float vFirst, float vSecond);
-		void printYRangeWithLeafXRange(const std::string& vFilePath, const CNode* vNode) const;
+		void printYRangeWithLeafXRange(const std::vector<float>& vFeatures, const std::string& vFilePath, const CNode* vNode) const;
 		void printResponseInfoInAABB(const std::vector<float>& vFeatures, const std::string& vFilePath, const CNode* vNode) const; 
-		void calFeatureRangeResponse(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, std::vector<std::pair<float, float>>& voResponseRange, std::vector<float>& voResponseVariance) const;
+		std::vector<int> calFeatureRangeResponse(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, std::vector<std::pair<float, float>>& voResponseRange, std::vector<float>& voResponseVariance) const;
 		std::vector<std::vector<int>> calFeatureRangeIndex(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, const std::vector<std::vector<float>>& vFeatureSet) const;
 		std::vector<int> calDupIndex(const std::vector<std::vector<int>>& vResponseIndex) const;
 
@@ -75,23 +75,25 @@ namespace hiveRegressionForest
 		std::vector<int>	m_OOBIndexSet;
 
 	private:
-		void __createLeafNode(CNode* vCurNode, const std::pair<int, int>& vRange, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset);
+		void __createLeafNode(CNode* vCurNode, const std::vector<int>& vDataSetIndex, const std::pair<int, int>& vRange, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset);
 		void __initTreeParameters(IBootstrapSelector* vBootstrapSelector, std::vector<int>& voBootstrapIndex);
 		void __obtainOOBIndex(std::vector<int>& vBootStrapIndexSet);
 		void __dumpAllTreeNodes(std::vector<const CNode*>& voAllTreeNodes) const;
 		void __updateFeaturesWeight(IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsLiveUpdating, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<float>& voFeaturesWeight);
-		
+		void __sortFeatureResponsePairSet();
+
 		CNode*       __createNode(unsigned int vLevel);
 		boost::any   __getTerminateConditionExtraParameter(const CNode* vNode);
 
-		std::pair<std::vector<std::vector<float>>, std::vector<float>> m_BootstrapDataset;
 		std::vector<int> m_BootstrapIndex;
+		std::vector<std::vector<std::pair<float, float>>> m_SortedFeatureResponsePairSet;
 		template <typename Archive>
 		void serialize(Archive & ar, const unsigned int version)
 		{
 			ar & m_pRoot;
 			ar & m_OOBIndexSet;
 			ar & m_BootstrapIndex;
+			ar & m_SortedFeatureResponsePairSet;
 		}
 
 		friend class boost::serialization::access;

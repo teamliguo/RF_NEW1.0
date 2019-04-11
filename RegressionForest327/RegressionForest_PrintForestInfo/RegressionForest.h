@@ -30,14 +30,14 @@ namespace hiveRegressionForest
 		void    outputOutFeatureRange(const std::string& vOutputFileName, const std::vector<float>& vOutRange) const;
 
 		float   predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction) const;
-		float   predict(const std::vector<float>& vFeatures, float vResponse, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction) const;
+		float   predict(const std::vector<float>& vFeatures, float vResponse, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, float& voMPPredictSet) const;
 		void	predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vNumResponse, std::vector<float>& voPredictValue) const;
 		
 		const CTree* getTreeAt(int vTreeIndex) const { return m_Trees[vTreeIndex]; }
 		
 	private:
 		float __predictCertainResponse(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vResponseIndex = 0) const;
-		float __predictCertainResponse(const std::vector<float>& vFeatures, float vResponse, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vResponseIndex = 0) const;
+		float __predictCertainResponse(const std::vector<float>& vFeatures, float vResponse, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, float& voMPPredictSet, unsigned int vResponseIndex = 0) const;
 
 		void __initForest();
 		void __initForestParameters(IBootstrapSelector*& voBootstrapSelector, IFeatureSelector*& voFeatureSelector, INodeSpliter*& voNodeSpliter, IBaseTerminateCondition*& voTerminateCondition, IFeatureWeightGenerator*& voFeatureWeightMethod);
