@@ -32,6 +32,11 @@
 *.out
 *.app
 
+# CSV¡¢TXT¡¢XLSX file
+*.CSV
+*.TXT
+*.XLSX
+
 *.suo
 *.sdf
 *.opensdf
