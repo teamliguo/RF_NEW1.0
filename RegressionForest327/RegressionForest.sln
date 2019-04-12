@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Experiment", "Experiment\Experiment.vcxproj", "{E1673503-0E6B-418C-A252-6E7E3E3AA25F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegressionForest", "RegressionForest\RegressionForest.vcxproj", "{F5A0EE47-84F4-48A8-9389-54294AE408F8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Testcase001_ComputeR2scoreOfEachTree", "Testcase001_ComputeR2scoreOfEachTree\Testcase001_ComputeR2scoreOfEachTree.vcxproj", "{4EBC9975-D09E-4757-B4E3-1E9C7892C972}"
 EndProject
@@ -39,6 +37,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegressionForest_OnlineRand
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Testcase008_OnlineRandomForest", "Testcase008_OnlineRandomForest\Testcase008_OnlineRandomForest.vcxproj", "{3D2850CF-C8B1-4161-9F2E-3E09DE3F5638}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegressionForest", "RegressionForest\RegressionForest.vcxproj", "{79FE5442-D28E-4CF2-8F98-58A8764A28BC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Testcase", "Testcase\Testcase.vcxproj", "{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -55,14 +57,6 @@ Global
 		{E1673503-0E6B-418C-A252-6E7E3E3AA25F}.Release|x64.Build.0 = Release|x64
 		{E1673503-0E6B-418C-A252-6E7E3E3AA25F}.Release|x86.ActiveCfg = Release|Win32
 		{E1673503-0E6B-418C-A252-6E7E3E3AA25F}.Release|x86.Build.0 = Release|Win32
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Debug|x64.ActiveCfg = Debug|x64
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Debug|x64.Build.0 = Debug|x64
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Debug|x86.ActiveCfg = Debug|Win32
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Debug|x86.Build.0 = Debug|Win32
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Release|x64.ActiveCfg = Release|x64
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Release|x64.Build.0 = Release|x64
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Release|x86.ActiveCfg = Release|Win32
-		{F5A0EE47-84F4-48A8-9389-54294AE408F8}.Release|x86.Build.0 = Release|Win32
 		{4EBC9975-D09E-4757-B4E3-1E9C7892C972}.Debug|x64.ActiveCfg = Debug|x64
 		{4EBC9975-D09E-4757-B4E3-1E9C7892C972}.Debug|x64.Build.0 = Debug|x64
 		{4EBC9975-D09E-4757-B4E3-1E9C7892C972}.Debug|x86.ActiveCfg = Debug|Win32
@@ -191,6 +185,22 @@ Global
 		{3D2850CF-C8B1-4161-9F2E-3E09DE3F5638}.Release|x64.Build.0 = Release|x64
 		{3D2850CF-C8B1-4161-9F2E-3E09DE3F5638}.Release|x86.ActiveCfg = Release|Win32
 		{3D2850CF-C8B1-4161-9F2E-3E09DE3F5638}.Release|x86.Build.0 = Release|Win32
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Debug|x64.ActiveCfg = Debug|x64
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Debug|x64.Build.0 = Debug|x64
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Debug|x86.ActiveCfg = Debug|Win32
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Debug|x86.Build.0 = Debug|Win32
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Release|x64.ActiveCfg = Release|x64
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Release|x64.Build.0 = Release|x64
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Release|x86.ActiveCfg = Release|Win32
+		{79FE5442-D28E-4CF2-8F98-58A8764A28BC}.Release|x86.Build.0 = Release|Win32
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Debug|x64.ActiveCfg = Debug|x64
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Debug|x64.Build.0 = Debug|x64
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Debug|x86.ActiveCfg = Debug|Win32
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Debug|x86.Build.0 = Debug|Win32
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Release|x64.ActiveCfg = Release|x64
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Release|x64.Build.0 = Release|x64
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Release|x86.ActiveCfg = Release|Win32
+		{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
