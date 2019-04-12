@@ -15,7 +15,7 @@ namespace hiveRegressionForest
 		virtual float predictV(const std::vector<float>& vFeatureInstance, unsigned int vResponseIndex) const override;
 		
 	protected:
-		virtual float _getNodeVarianceV(unsigned int vResponseIndex = 0) const override;
+		virtual float getNodeVarianceV(unsigned int vResponseIndex = 0) const override;
 
 	private:
 		float* m_NodeAvgValuePtr = new float(0.0f);

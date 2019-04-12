@@ -51,7 +51,7 @@ float CMultiResponseNode::predictV(const std::vector<float>& vFeatureInstance, u
 
 //****************************************************************************************************
 //FUNCTION:
-float CMultiResponseNode::_getNodeVarianceV(unsigned int vResponseIndex /*= 0*/) const
+float CMultiResponseNode::getNodeVarianceV(unsigned int vResponseIndex /*= 0*/) const
 {
 	return m_NodeVariancePtr[vResponseIndex];
 }

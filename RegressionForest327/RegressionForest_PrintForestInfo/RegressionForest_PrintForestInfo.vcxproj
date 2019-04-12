@@ -158,11 +158,16 @@
     <ClInclude Include="BaseFeatureSelector.h" />
     <ClInclude Include="BaseFeatureWeightMethod.h" />
     <ClInclude Include="BaseInstanceWeightMethod.h" />
+    <ClInclude Include="BasePredictionMethod.h" />
     <ClInclude Include="BaseSplitMethod.h" />
     <ClInclude Include="BaseTerminateCondition.h" />
     <ClInclude Include="BasicCondition.h" />
     <ClInclude Include="FeatureWeightVIMethod.h" />
+    <ClInclude Include="InternalNodePredictionMethod.h" />
+    <ClInclude Include="LPPredictionMethod.h" />
+    <ClInclude Include="MeanPredictionMethod.h" />
     <ClInclude Include="MpCompute.h" />
+    <ClInclude Include="MPPredictionMethod.h" />
     <ClInclude Include="MultiInfoGainSplit.h" />
     <ClInclude Include="MultiResponseNode.h" />
     <ClInclude Include="EarlyFittingCondition.h" />
@@ -188,6 +193,7 @@
     <ClInclude Include="UniformBootstrapSelector.h" />
     <ClInclude Include="UniformFeatureSelector.h" />
     <ClInclude Include="Utility.h" />
+    <ClInclude Include="VariancePredictionMethod.h" />
     <ClInclude Include="WeightedBootstrapSelector.h" />
     <ClInclude Include="WeightedFeatureSelector.h" />
     <ClInclude Include="WeightedPathNodeMethod.h" />
@@ -202,7 +208,11 @@
     <ClCompile Include="FeatureWeightRSSMethod.cpp" />
     <ClCompile Include="FeatureWeightVIMethod.cpp" />
     <ClCompile Include="InstanceWeightResponseMethod.cpp" />
+    <ClCompile Include="InternalNodePredictionMethod.cpp" />
+    <ClCompile Include="LPPredictionMethod.cpp" />
+    <ClCompile Include="MeanPredictionMethod.cpp" />
     <ClCompile Include="MpCompute.cpp" />
+    <ClCompile Include="MPPredictionMethod.cpp" />
     <ClCompile Include="MultiInfoGainSplit.cpp" />
     <ClCompile Include="MultiResponseNode.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -219,6 +229,7 @@
     <ClCompile Include="UniformBootstrapSelector.cpp" />
     <ClCompile Include="UniformFeatureSelector.cpp" />
     <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="VariancePredictionMethod.cpp" />
     <ClCompile Include="WeightedBootstrapSelector.cpp" />
     <ClCompile Include="WeightedFeatureSelector.cpp" />
     <ClCompile Include="WeightedPathNodeMethod.cpp" />

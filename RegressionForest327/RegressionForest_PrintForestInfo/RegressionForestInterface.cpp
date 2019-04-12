@@ -30,56 +30,20 @@ unsigned int hiveRegressionForest::hiveBuildRegressionForest(const std::string& 
 	return ForestId;
 }
 
-//****************************************************************************************************
-//FUNCTION:
-float hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, bool vIsWeightedPrediction)
+//******************************************************************************
+//FUNCTION:  for single response
+std::vector<float> hiveRegressionForest::hivePredict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet, unsigned vForestId)
 {
-	_ASSERT(!vTestInstance.empty());
+	_ASSERT(!vTestFeatureSet.empty() && !vTestResponseSet.empty());
 
 	const CRegressionForest* pRegressionForest = CRegressionForestPool::getInstance()->fetchForest(vForestId);
 	_ASSERTE(pRegressionForest);
 
-	return hivePredict(vTestInstance, vForestId, pRegressionForest->getNumOfTrees(), vIsWeightedPrediction);
+	return pRegressionForest->predict(vTestFeatureSet, vTestResponseSet, pRegressionForest->getNumOfTrees());
 }
 
 //****************************************************************************************************
-//FUNCTION:
-float hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction)
-{
-	_ASSERT(!vTestInstance.empty());
-
-	const CRegressionForest* pRegressionForest = CRegressionForestPool::getInstance()->fetchForest(vForestId);
-	_ASSERTE(pRegressionForest);
-
-	return pRegressionForest->predict(vTestInstance, vNumOfUsingTrees, vIsWeightedPrediction);
-}
-
-//****************************************************************************************************
-//FUNCTION:
-float hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, float vTestResponse, unsigned int vForestId, float& voMPPredictSet, bool vIsWeightedPrediction)
-{
-	_ASSERT(!vTestInstance.empty());
-
-	const CRegressionForest* pRegressionForest = CRegressionForestPool::getInstance()->fetchForest(vForestId);
-	_ASSERTE(pRegressionForest);
-
-	return hivePredict(vTestInstance, vTestResponse, vForestId, pRegressionForest->getNumOfTrees(), voMPPredictSet, vIsWeightedPrediction);
-}
-
-//****************************************************************************************************
-//FUNCTION:
-float hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, float vTestResponse, unsigned int vForestId, unsigned int vNumOfUsingTrees, float& voMPPredictSet, bool vIsWeightedPrediction)
-{
-	_ASSERT(!vTestInstance.empty());
-
-	const CRegressionForest* pRegressionForest = CRegressionForestPool::getInstance()->fetchForest(vForestId);
-	_ASSERTE(pRegressionForest);
-
-	return pRegressionForest->predict(vTestInstance, vTestResponse, vNumOfUsingTrees, vIsWeightedPrediction, voMPPredictSet);
-}
-
-//****************************************************************************************************
-//FUNCTION:
+//FUNCTION:  for multiple response
 void hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, unsigned int vNumResponse, std::vector<float>& voPredictValue, bool vIsWeightedPrediction /*= true*/)
 {
 	_ASSERT(!vTestInstance.empty());
@@ -91,7 +55,7 @@ void hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, 
 }
 
 //****************************************************************************************************
-//FUNCTION:
+//FUNCTION:  for multiple response
 void hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, int vNumOfUsingTrees, unsigned int vNumResponse, std::vector<float>& voPredictValue, bool vIsWeightedPrediction /*= true*/)
 {
 	_ASSERT(!vTestInstance.empty());

@@ -43,7 +43,10 @@ bool CTrainingSet::loadTrainingSet(const std::string& vConfig, bool vHeader)
 	{
 		normalization(m_FeatureSet);
 	}
-	
+	__calStandardDeviation(m_FeatureSet, m_EachDimStandard);
+	__calFeatureRange();
+	__calResponseRange();
+
 	return IsLoadDataSuccess;
 }
 
@@ -70,6 +73,18 @@ void CTrainingSet::recombineBootstrapDataset(const std::vector<int>& vBootstrapI
 		}
 		++ResponseIndex;
 	}
+}
+
+//******************************************************************************
+//FUNCTION:根据范围输出总表的下标
+void CTrainingSet::recombineBootstrapDataset(const std::vector<int>& vBootstrapIndexSet, const std::pair<int, int>& vBootstrapIndexRange, std::vector<int>& voRangeIndex)
+{
+	_ASSERTE(!vBootstrapIndexSet.empty());
+
+	int Range = vBootstrapIndexRange.second - vBootstrapIndexRange.first;
+	_ASSERTE(Range > 0);
+	for (auto i = vBootstrapIndexRange.first; i < vBootstrapIndexRange.second; ++i)
+		voRangeIndex.push_back(vBootstrapIndexSet[i]);
 }
 
 //****************************************************************************************************
@@ -226,4 +241,68 @@ void CTrainingSet::normalization(std::vector<std::vector<float>>& voFeatureSet)
 			voFeatureSet[k][i] = (voFeatureSet[k][i] - m_FeatureMean[i]) / m_FeatureStd[i];
 		}
 	}
+}
+
+//******************************************************************************
+//FUNCTION:
+void CTrainingSet::__calDimFeatures(const std::vector<std::vector<float>>& vFeatureDataSet, std::vector<std::vector<float>>& voDimFeatureDataSet)
+{
+	voDimFeatureDataSet.resize(vFeatureDataSet[0].size());
+	for (int i = 0; i < vFeatureDataSet[0].size(); i++)
+		for (int j = 0; j < vFeatureDataSet.size(); j++)
+			voDimFeatureDataSet[i].push_back(vFeatureDataSet[j][i]);
+}
+
+//******************************************************************************
+//FUNCTION:计算标准差
+void CTrainingSet::__calStandardDeviation(const std::vector<std::vector<float>>& vFeatureDataSet, std::vector<float>& voEachDimStandard)
+{
+	_ASSERTE(!vFeatureDataSet.empty());
+	std::vector<std::vector<float>> DimFeature;
+	__calDimFeatures(vFeatureDataSet, DimFeature);
+	std::vector<float> StandardDeviationSum(DimFeature.size(), 0.f);
+	for (int i = 0; i < DimFeature.size(); i++)
+	{
+		float Average = accumulate(DimFeature[i].begin(), DimFeature[i].end(), 0.f) / DimFeature[0].size();
+		for (int j = 0; j < DimFeature[0].size(); j++)
+		{
+			StandardDeviationSum[i] += pow(DimFeature[i][j] - Average, 2.0f);
+		}
+		voEachDimStandard.push_back(pow(StandardDeviationSum[i] / DimFeature[0].size(), 0.5f));
+	}
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CTrainingSet::__calResponseRange()
+{
+	float MaxResponse = (std::numeric_limits<float>::min)();
+	float MinResponse = (std::numeric_limits<float>::max)();
+	for (int i = 0; i < m_FeatureSet.size(); ++i)
+	{
+		for (int m = 0; m < m_NumResponse; ++m)
+		{
+			MaxResponse = (m_pResponseSet[i*m_NumResponse + m] > MaxResponse) ? m_pResponseSet[i*m_NumResponse + m] : MaxResponse;
+			MinResponse = (m_pResponseSet[i*m_NumResponse + m] < MinResponse) ? m_pResponseSet[i*m_NumResponse + m] : MinResponse;
+		}
+	}
+	m_ResponseRange = std::make_pair(MinResponse, MaxResponse);
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CTrainingSet::__calFeatureRange()
+{
+	std::vector<float> MinFeature, MaxFeature;
+	for (int i = 0; i < m_FeatureSet[0].size(); i++)
+	{
+		std::vector<float> Column(m_FeatureSet.size());
+		for (int k = 0; k < m_FeatureSet.size(); k++)
+			Column[k] = m_FeatureSet[k][i];
+		float max = *std::max_element(Column.begin(), Column.end());
+		float min = *std::min_element(Column.begin(), Column.end());
+		MinFeature.push_back(min);
+		MaxFeature.push_back(max);
+	}
+	m_FeatureRange = std::make_pair(MinFeature, MaxFeature);
 }

@@ -40,4 +40,5 @@ void CRegressionForestConfig::__defineAcceptableAttributes()
 	defineAttribute(KEY_WORDS::OPENMP_PARALLEL_BUILD_TREE,					hiveConfig::ATTRIBUTE_BOOL);
 	defineAttribute(KEY_WORDS::BUILD_TREE_TYPE,								hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::CREATE_NODE_TYPE,							hiveConfig::ATTRIBUTE_STRING);
+	defineAttribute(KEY_WORDS::PREDICTION_METHOD,                           hiveConfig::ATTRIBUTE_STRING);
 }

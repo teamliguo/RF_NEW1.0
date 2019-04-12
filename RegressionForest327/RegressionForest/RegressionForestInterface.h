@@ -10,7 +10,10 @@ namespace hiveRegressionForest
 	//for single response
 	REGRESSION_FOREST_EXPORTS float						hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, bool vIsWeightedPrediction = true);
 	REGRESSION_FOREST_EXPORTS float 					hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction = true);
-
+	
+	REGRESSION_FOREST_EXPORTS float						hivePredict(const std::vector<float>& vTestInstance, float vTestResponse, unsigned int vForestId, float& voMPPredictSet, bool vIsWeightedPrediction = true);
+	REGRESSION_FOREST_EXPORTS float 					hivePredict(const std::vector<float>& vTestInstance, float vTestResponse, unsigned int vForestId, unsigned int vNumOfUsingTrees, float& voMPPredictSet, bool vIsWeightedPrediction = true);
+	
 	//for multiple response
 	REGRESSION_FOREST_EXPORTS void						hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, unsigned int vNumResponse, std::vector<float>& voPredictValue, bool vIsWeightedPrediction = false);
 	REGRESSION_FOREST_EXPORTS void						hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, int vNumOfUsingTrees, unsigned int vNumResponse, std::vector<float>& voPredictValue, bool vIsWeightedPrediction = false);

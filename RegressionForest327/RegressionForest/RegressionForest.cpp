@@ -3,6 +3,7 @@
 #include <numeric>
 #include <fstream>
 #include <algorithm>
+#include <map>
 #include "common/CommonInterface.h"
 #include "common/ConfigParser.h"
 #include "common/HiveCommonMicro.h"
@@ -13,6 +14,8 @@
 #include "BaseInstanceWeightMethod.h"
 #include "RegressionForestConfig.h"
 #include "RegressionForestCommon.h"
+#include "WeightedPathNodeMethod.h"
+#include "MpCompute.h"
 
 using namespace hiveRegressionForest;
 
@@ -139,6 +142,13 @@ float CRegressionForest::predict(const std::vector<float>& vFeatures, unsigned i
 
 //****************************************************************************************************
 //FUNCTION:
+float CRegressionForest::predict(const std::vector<float>& vFeatures, float vResponse, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, float& voMPPredictSet) const
+{
+	return __predictCertainResponse(vFeatures, vResponse, vNumOfUsingTrees, vIsWeightedPrediction, voMPPredictSet);
+}
+
+//****************************************************************************************************
+//FUNCTION:
 void CRegressionForest::predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vNumResponse, std::vector<float>& voPredictValue) const
 {
 	_ASSERTE(!vFeatures.empty());
@@ -162,13 +172,9 @@ float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFea
 	LeafNodeSet.resize(this->getNumOfTrees());
 	for (int i = 0; i < vNumOfUsingTrees; ++i)
 	{
-		//if (vResponseIndex == 0) LeafNodeSet[i] = m_Trees[i]->locateLeafNode(vFeatures);
-		//PredictValueOfTree[i] = m_Trees[i]->predict(*LeafNodeSet[i], vFeatures, NodeWeight[i], vResponseIndex);
-		std::cout << "tree " << i << ": " << std::endl;
-		PredictValueOfTree[i] = m_Trees[i]->traverWithDistanceFromFeatureRange(vFeatures);
-		std::cout << "Predict Value Of Tree " << i << ": " << PredictValueOfTree[i] << std::endl;
+		if (vResponseIndex == 0)	LeafNodeSet[i] = m_Trees[i]->locateLeafNode(vFeatures);
+		PredictValueOfTree[i] = m_Trees[i]->predict(*LeafNodeSet[i], vFeatures, NodeWeight[i], vResponseIndex);
 	}
-	std::cout << std::endl;
 
 	_ASSERTE(PredictValueOfTree.size() == NodeWeight.size());
 
@@ -186,6 +192,90 @@ float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFea
 		PredictValue = std::accumulate(PredictValueOfTree.begin(), PredictValueOfTree.end(), 0.0f);
 		return PredictValue / vNumOfUsingTrees;
 	}
+}
+
+//****************************************************************************************************
+//FUNCTION:
+float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFeatures, float vResponse, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, float& voMPPredictSet, unsigned int vResponseIndex) const
+{
+	_ASSERTE(!vFeatures.empty() && vNumOfUsingTrees > 0);
+
+	float PredictValue = 0.0f;
+	std::vector<float> PredictValueOfTree(vNumOfUsingTrees, 0.0f), PredictValueOfTreeTemp(vNumOfUsingTrees, 0.0f);
+	std::vector<float> NodeWeight(vNumOfUsingTrees, 0.0f);
+	std::vector<float> MPDistanceWeight(vNumOfUsingTrees, 0.0f);
+	std::vector<std::pair<int, float>> PredictBias(vNumOfUsingTrees);
+
+	std::vector<const CNode*> LeafNodeSet;
+	LeafNodeSet.resize(this->getNumOfTrees());
+	std::vector<std::vector<SPathNodeInfo>> AllTreePath(vNumOfUsingTrees);
+	std::vector<std::vector<float>> OutLeafFeatureRange(vNumOfUsingTrees);
+	std::vector<std::vector<float>> OutLeafFeatureSplitRange(vNumOfUsingTrees);
+	CWeightedPathNodeMethod* pWeightedPathNode = CWeightedPathNodeMethod::getInstance();
+	CMpCompute* pMpCompute = nullptr;
+	bool IsPrint =  CTrainingSetConfig::getInstance()->getAttribute<bool>(hiveRegressionForest::KEY_WORDS::IS_PRINT_LEAF_NODE);
+	for (int i = 0; i < vNumOfUsingTrees; ++i)
+	{
+		if (vResponseIndex == 0)
+		{
+			if (IsPrint)
+			{
+				std::vector<SPathNodeInfo> CurrentTreePathInfo;
+				std::vector<float> TempOutLeafFeatureRange;
+				std::vector<float> TempOutLeafFeatureSplitRange;
+				LeafNodeSet[i] = m_Trees[i]->recordPathNodeInfo(vFeatures, CurrentTreePathInfo, TempOutLeafFeatureRange, TempOutLeafFeatureSplitRange, i);
+				PredictValueOfTree[i] = LeafNodeSet[i]->getNodeMeanV();
+				AllTreePath[i] = CurrentTreePathInfo;
+				OutLeafFeatureRange[i] = TempOutLeafFeatureRange;
+				OutLeafFeatureSplitRange[i] = TempOutLeafFeatureSplitRange;
+			}
+			else
+			{
+				LeafNodeSet[i] = m_Trees[i]->locateLeafNode(vFeatures);
+				PredictValueOfTree[i] = LeafNodeSet[i]->getNodeMeanV();
+				//voMPPredictSet += pWeightedPathNode->predictWithMinMPOnWholeDimension(m_Trees[i], vFeatures);
+				//MPDistanceWeight[i] = pMpCompute->calMPOutOfFeatureAABB(m_Trees[i], LeafNodeSet[i], vFeatures);
+				//MPDistanceWeight[i] = pMpCompute->calMPDissimilarityGlobal(m_Trees[i], LeafNodeSet[i]->getNodeDataIndexV(), vFeatures, PredictValueOfTree[i]);
+				std::vector<std::pair<float, float>> ResponseRange;
+				std::vector<float> ResponseVariance;
+				std::vector<int> ReponseNum = m_Trees[i]->calFeatureRangeResponse(LeafNodeSet[i]->getFeatureRange(), ResponseRange, ResponseVariance);
+				MPDistanceWeight[i] = std::accumulate(ResponseVariance.begin(), ResponseVariance.end(), 0.f);
+			}
+		}
+		PredictBias[i] = std::make_pair(i, std::abs(PredictValueOfTree[i] - vResponse) / vResponse);
+	}
+	if (IsPrint)
+	{
+		sort(PredictBias.begin(), PredictBias.end(), [](std::pair<int, float>& vFirst, std::pair<int, float>& vSecond) {return vFirst.second < vSecond.second; });
+		printAllInfo(vFeatures, PredictBias, LeafNodeSet, AllTreePath, OutLeafFeatureRange, OutLeafFeatureSplitRange);
+	}
+	_ASSERTE(PredictValueOfTree.size() == NodeWeight.size());
+	if (vIsWeightedPrediction)
+	{
+		for (int k = 0; k < vNumOfUsingTrees; ++k)
+			PredictValue += PredictValueOfTree[k] * NodeWeight[k];
+		float SumWeight = std::accumulate(NodeWeight.begin(), NodeWeight.end(), 0.0f);
+		_ASSERTE(SumWeight > 0);
+		return PredictValue / SumWeight;
+	}
+	else
+	{
+		//voMPPredictSet = voMPPredictSet / vNumOfUsingTrees;
+		float SumWeight = std::accumulate(MPDistanceWeight.begin(), MPDistanceWeight.end(), 0.f);
+		float MeanWeight = SumWeight / vNumOfUsingTrees, SumWeightUsed = 0.f;
+		for (int k = 0; k < vNumOfUsingTrees; ++k)
+		{
+			if (MPDistanceWeight[k] <= MeanWeight)
+			{
+				voMPPredictSet += PredictValueOfTree[k] * 1 / MPDistanceWeight[k];
+				SumWeightUsed += 1 / MPDistanceWeight[k];
+			}
+		}
+		voMPPredictSet = voMPPredictSet / SumWeightUsed;
+		PredictValue = std::accumulate(PredictValueOfTree.begin(), PredictValueOfTree.end(), 0.0f);
+		return PredictValue / vNumOfUsingTrees;
+	}
+	_SAFE_DELETE(pMpCompute);
 }
 
 //********************************************************************************************************
@@ -251,6 +341,8 @@ void CRegressionForest::__clearForest()
 		if (m_Trees[i]) _SAFE_DELETE(m_Trees[i]);
 }
 
+//****************************************************************************************************
+//FUNCTION:
 void CRegressionForest::outputOOBInfo(const std::string& vOutputFileName) const
 {
 	std::fstream OutPutFile(vOutputFileName, std::ios::out);
@@ -263,5 +355,85 @@ void CRegressionForest::outputOOBInfo(const std::string& vOutputFileName) const
 			Itr->fetchTreeInfo(TreeInfo);
 			OutPutFile << TreeInfo.m_NumOfLeafNodes << "," << Itr->getOOBIndexSet().size() << std::endl;
 		}
+	}
+}
+
+//******************************************************************************
+//FUNCTION:
+void CRegressionForest::outputPathNodeInfo(const std::string& vOutputFileName, const std::vector<SPathNodeInfo>& vPathNodeInfo) const
+{
+	std::ofstream OutputFile;
+	OutputFile.open(vOutputFileName, std::ios::app);
+	if (OutputFile.is_open())
+	{
+		for (auto iterNode : vPathNodeInfo)
+		{
+			OutputFile << iterNode.m_NodeLevel << "," << iterNode.m_SplitFeature << "," << iterNode.m_SplitLocation << std::endl;
+			std::vector<float> SplitMin = iterNode.m_FeatureSplitRange.first;
+			std::vector<float> SplitMax = iterNode.m_FeatureSplitRange.second;
+			std::vector<float> FeatureMin = iterNode.m_FeatureRange.first;
+			std::vector<float> FeatureMax = iterNode.m_FeatureRange.second;
+			OutputFile << ",";
+			for (auto i = 0; i < SplitMin.size(); i++)
+				OutputFile << SplitMin[i] << "~" << SplitMax[i] << ",";
+			OutputFile << std::endl;
+			OutputFile << ",";
+			for (auto j = 0; j < FeatureMin.size(); j++)
+				OutputFile << FeatureMin[j] << "~" << FeatureMax[j] << ",";
+			OutputFile << std::endl;
+		}
+	}
+}
+
+//******************************************************************************
+//FUNCTION:
+void CRegressionForest::printAllInfo(const std::vector<float>& vFeatures, const std::vector<std::pair<int, float>>& vPredictBias, const std::vector<const CNode*>& vLeafNodeSet, const std::vector<std::vector<SPathNodeInfo>>& vAllTreePath, const std::vector<std::vector<float>>& vOutRange, const std::vector<std::vector<float>>& vOutSplitRange) const
+{
+	std::string BestTreeFilePath = CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BEST_TREE_PATH);
+	std::string BadTreeFilePath = CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BAD_TREE_PATH);
+	std::ofstream BestTreeFile;
+	std::ofstream BadTreeFile;
+	BestTreeFile.open(BestTreeFilePath, std::ios::app);
+	BadTreeFile.open(BadTreeFilePath, std::ios::app);
+	int NumOfUsingTrees = vPredictBias.size();
+	int PrintNum = CTrainingSetConfig::getInstance()->getAttribute<int>(hiveRegressionForest::KEY_WORDS::PRINT_TREE_NUMBER);
+	_ASSERTE(PrintNum <= NumOfUsingTrees);
+	for (int i = 0; i < PrintNum; i++)
+	{
+		int BestTreeIndex = vPredictBias[i].first;
+		int BadTreeIndex = vPredictBias[NumOfUsingTrees - 1 - i].first;
+		BestTreeFile << "Tree" << BestTreeIndex << std::endl;
+		BadTreeFile << "Tree" << BadTreeIndex << std::endl;
+		//vLeafNodeSet[BestTreeIndex]->outputLeafNodeInfo(BestTreeFilePath);
+		m_Trees[BestTreeIndex]->printYRangeWithLeafXRange(vFeatures, BestTreeFilePath, vLeafNodeSet[BestTreeIndex]);
+		//outputPathNodeInfo(BestTreeFilePath, vAllTreePath[BestTreeIndex]);
+		//outputOutFeatureRange(BestTreeFilePath, vOutSplitRange[BestTreeIndex]);
+		//outputOutFeatureRange(BestTreeFilePath, vOutRange[BestTreeIndex]);
+		m_Trees[BestTreeIndex]->printResponseInfoInAABB(vFeatures, BestTreeFilePath, vLeafNodeSet[BestTreeIndex]);
+		//vLeafNodeSet[BadTreeIndex]->outputLeafNodeInfo(BadTreeFilePath);
+		m_Trees[BadTreeIndex]->printYRangeWithLeafXRange(vFeatures, BadTreeFilePath, vLeafNodeSet[BadTreeIndex]);
+		//outputPathNodeInfo(BadTreeFilePath, vAllTreePath[BadTreeIndex]);
+		//outputOutFeatureRange(BadTreeFilePath, vOutSplitRange[BadTreeIndex]);
+		//outputOutFeatureRange(BadTreeFilePath, vOutRange[BadTreeIndex]);
+		//m_Trees[BadTreeIndex]->printResponseInfoInAABB(vFeatures, BadTreeFilePath, vLeafNodeSet[BadTreeIndex]);
+	}
+	BestTreeFile << std::endl;
+	BadTreeFile << std::endl;
+	BestTreeFile.close();
+	BadTreeFile.close();
+}
+
+//******************************************************************************
+//FUNCTION:
+void hiveRegressionForest::CRegressionForest::outputOutFeatureRange(const std::string & vOutputFileName, const std::vector<float>& vOutRange) const
+{
+	std::ofstream OutputFile;
+	OutputFile.open(vOutputFileName, std::ios::app);
+	if (OutputFile.is_open())
+	{
+		OutputFile << "OutFeature" << ",";
+		for (auto iterNode : vOutRange)
+			OutputFile << iterNode << ",";
+		OutputFile << std::endl;
 	}
 }

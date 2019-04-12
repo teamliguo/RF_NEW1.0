@@ -61,5 +61,14 @@ namespace hiveRegressionForest
 		const std::string CREATE_NODE_TYPE					= "CREATE_NODE_TYPE";
 		const std::string SINGLE_RESPONSE_NODE				= "SINGLE_RESPONSE_NODE";
 		const std::string MULTI_RESPONSES_NODE				= "MULTI_RESPONSES_NODE";
+
+		//select prediction method 
+		const std::string PREDICTION_METHOD                 = "PREDICTION_METHOD";
+		const std::string INTERNAL_NODE_PREDICTION_METHOD   = "INTERNAL_NODE_PREDICTION_METHOD";
+		const std::string MP_PREDICTION_METHOD              = "MP_PREDICTION_METHOD";
+		const std::string MEAN_PREDICTION_METHOD            = "MEAN_PREDICTION_METHOD";
+		const std::string LP_PREDICTION_METHOD              = "LP_PREDICTION_METHOD";
+		const std::string VARIANCE_PREDICTION_METHOD        = "VARIANCE_PREDICTION_METHOD";
+
 	}
 }

@@ -100,6 +100,24 @@
       <Filter>PathPredict</Filter>
     </ClInclude>
     <ClInclude Include="Utility.h" />
+    <ClInclude Include="BasePredictionMethod.h">
+      <Filter>PredictionMethod</Filter>
+    </ClInclude>
+    <ClInclude Include="InternalNodePredictionMethod.h">
+      <Filter>PredictionMethod</Filter>
+    </ClInclude>
+    <ClInclude Include="LPPredictionMethod.h">
+      <Filter>PredictionMethod</Filter>
+    </ClInclude>
+    <ClInclude Include="MeanPredictionMethod.h">
+      <Filter>PredictionMethod</Filter>
+    </ClInclude>
+    <ClInclude Include="MPPredictionMethod.h">
+      <Filter>PredictionMethod</Filter>
+    </ClInclude>
+    <ClInclude Include="VariancePredictionMethod.h">
+      <Filter>PredictionMethod</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Config">
@@ -128,6 +146,9 @@
     </Filter>
     <Filter Include="PathPredict">
       <UniqueIdentifier>{d7b2c583-d536-412a-a861-ace8f4c7560a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PredictionMethod">
+      <UniqueIdentifier>{7f2088ed-3727-47b3-9ee2-e6a4d3e7e168}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -212,5 +233,20 @@
       <Filter>PathPredict</Filter>
     </ClCompile>
     <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="InternalNodePredictionMethod.cpp">
+      <Filter>PredictionMethod</Filter>
+    </ClCompile>
+    <ClCompile Include="LPPredictionMethod.cpp">
+      <Filter>PredictionMethod</Filter>
+    </ClCompile>
+    <ClCompile Include="MeanPredictionMethod.cpp">
+      <Filter>PredictionMethod</Filter>
+    </ClCompile>
+    <ClCompile Include="MPPredictionMethod.cpp">
+      <Filter>PredictionMethod</Filter>
+    </ClCompile>
+    <ClCompile Include="VariancePredictionMethod.cpp">
+      <Filter>PredictionMethod</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

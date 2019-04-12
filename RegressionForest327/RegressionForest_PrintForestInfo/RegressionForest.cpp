@@ -72,6 +72,17 @@ void CRegressionForest::buildForest(const std::string& vConfigFile)
 	_LOG_("Successfully built regression forests in " + std::to_string(End - Begin) + " milliseconds.");
 }
 
+//******************************************************************************
+//FUNCTION:  for single response
+std::vector<float> CRegressionForest::predict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet, unsigned int vTreeNumber) const
+{
+	_ASSERTE(!vTestFeatureSet.empty() && !vTestResponseSet.empty());
+	for (auto i = 0; i < vTestFeatureSet.size(); i++)
+	{
+
+	}
+}
+
 //****************************************************************************************************
 //FUNCTION:
 void CRegressionForest::outputForestInfo(const std::string& vOutputFileName) const
@@ -134,21 +145,7 @@ void CRegressionForest::outputForestInfo(const std::string& vOutputFileName) con
 }
 
 //****************************************************************************************************
-//FUNCTION:
-float CRegressionForest::predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction) const
-{ 
-	return __predictCertainResponse(vFeatures, vNumOfUsingTrees, vIsWeightedPrediction);
-}
-
-//****************************************************************************************************
-//FUNCTION:
-float CRegressionForest::predict(const std::vector<float>& vFeatures, float vResponse, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, float& voMPPredictSet) const
-{
-	return __predictCertainResponse(vFeatures, vResponse, vNumOfUsingTrees, vIsWeightedPrediction, voMPPredictSet);
-}
-
-//****************************************************************************************************
-//FUNCTION:
+//FUNCTION: for multiResponse
 void CRegressionForest::predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vNumResponse, std::vector<float>& voPredictValue) const
 {
 	_ASSERTE(!vFeatures.empty());

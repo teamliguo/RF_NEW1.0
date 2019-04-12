@@ -93,9 +93,13 @@
     <ClInclude Include="FeatureWeightVIMethod.h">
       <Filter>Weight</Filter>
     </ClInclude>
-    <ClInclude Include="MpCompute.h" />
+    <ClInclude Include="MpCompute.h">
+      <Filter>MpMethod</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightedPathNodeMethod.h">
+      <Filter>PathPredict</Filter>
+    </ClInclude>
     <ClInclude Include="Utility.h" />
-    <ClInclude Include="WeightedPathNodeMethod.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Config">
@@ -118,6 +122,12 @@
     </Filter>
     <Filter Include="Selector">
       <UniqueIdentifier>{3e3d62b3-f9d3-4caf-9a1b-35f201ed7e44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MpMethod">
+      <UniqueIdentifier>{0cd7f521-a296-48b1-b3b1-345522a4784e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PathPredict">
+      <UniqueIdentifier>{d7b2c583-d536-412a-a861-ace8f4c7560a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -195,8 +205,12 @@
     <ClCompile Include="FeatureWeightVIMethod.cpp">
       <Filter>Weight</Filter>
     </ClCompile>
-    <ClCompile Include="MpCompute.cpp" />
+    <ClCompile Include="MpCompute.cpp">
+      <Filter>MpMethod</Filter>
+    </ClCompile>
+    <ClCompile Include="WeightedPathNodeMethod.cpp">
+      <Filter>PathPredict</Filter>
+    </ClCompile>
     <ClCompile Include="Utility.cpp" />
-    <ClCompile Include="WeightedPathNodeMethod.cpp" />
   </ItemGroup>
 </Project>

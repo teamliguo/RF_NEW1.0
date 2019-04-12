@@ -28,7 +28,7 @@ void CRegressionForestConfig::__defineAcceptableAttributes()
 	defineAttribute(KEY_WORDS::MAX_TREE_DEPTH,								hiveConfig::ATTRIBUTE_INT);
 	defineAttribute(KEY_WORDS::MAX_LEAF_NODE_INSTANCE_SIZE,					hiveConfig::ATTRIBUTE_INT);
 	defineAttribute(KEY_WORDS::NUMBER_CANDIDATE_FEATURE,					hiveConfig::ATTRIBUTE_INT);
-	defineAttribute(KEY_WORDS::NODE_SPLIT_METHOD,							hiveConfig::ATTRIBUTE_STRING);	
+	defineAttribute(KEY_WORDS::NODE_SPLIT_METHOD,							hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::LEAF_NODE_MODEL_SIGNATURE,					hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::FEATURE_SELECTOR,							hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::FEATURE_WEIGHT_CALCULATE_METHOD,				hiveConfig::ATTRIBUTE_STRING);
