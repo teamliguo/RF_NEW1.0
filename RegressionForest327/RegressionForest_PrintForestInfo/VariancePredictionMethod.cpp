@@ -1,12 +1,12 @@
-#include "MPPredictionMethod.h"
+#include "VariancePredictionMethod.h"
 #include "RegressionForestCommon.h"
 #include "common/ProductFactory.h"
 
 using namespace hiveRegressionForest;
 
-hiveOO::CProductFactory<CMPPredictionMethod> theCreator(KEY_WORDS::MP_PREDICTION_METHOD);
+hiveOO::CProductFactory<CVariancePredictionMethod> theCreator(KEY_WORDS::VARIANCE_PREDICTION_METHOD);
 
-float CMPPredictionMethod::predictCertainResponseV(const std::vector<float>& vTestFeatureInstance, float vTestResponse, unsigned int vTreeNumber)
+float CVariancePredictionMethod::predictCertainResponseV(const std::vector<float>& vTestFeatureInstance, float vTestResponse, unsigned int vTreeNumber)
 {
 	return 0.0f;
 }
