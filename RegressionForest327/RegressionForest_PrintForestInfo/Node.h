@@ -20,13 +20,13 @@ namespace hiveRegressionForest
 
 		//NOTES : 此处使用默认参数vResponseIndex以满足单响应和多响应的需求
 		virtual float predictV(const std::vector<float>& vFeatureInstance, unsigned int vResponseIndex = 0) const { return FLT_MAX; }
-		virtual float getNodeMeanV(unsigned int vResponseIndex = 0) const { return FLT_MAX; } //11.27-gss
+		virtual float getNodeMeanV(unsigned int vResponseIndex = 0) const { return FLT_MAX; } 
 		virtual float getNodeVarianceV(unsigned int vResponseIndex = 0) const { return FLT_MAX; }
 		virtual std::vector<int> getNodeDataIndexV()const { return std::vector<int>(); };
-		virtual void  calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) {}; //11.28-gss
+		virtual void  calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) {};
 		float         calculateNodeWeight(unsigned int vResponseIndex = 0) const;
 
-		std::pair<std::vector<float>, std::vector<float>> calFeatureRange(const std::vector<std::vector<float>>& vFeatureSet); //11.27-gss
+		std::pair<std::vector<float>, std::vector<float>> calFeatureRange(const std::vector<std::vector<float>>& vFeatureSet);
 		std::vector<float>                                calOutFeatureRange(const std::vector<float>& vFeatures) const;
 		std::vector<float>                                calOutFeatureSplitRange(const std::vector<float>& vFeatures) const;
 
@@ -50,9 +50,9 @@ namespace hiveRegressionForest
 		float			getBestGap()				const { return m_BestGap; }		
 		unsigned int	getBestSplitFeatureIndex()	const { return m_BestSplitFeatureIndex; }
 
-		std::pair<std::vector<float>, std::vector<float>> getFeatureRange() const { return m_FeatureRange; } //11.27-gss
+		std::pair<std::vector<float>, std::vector<float>> getFeatureRange() const { return m_FeatureRange; }
 		std::pair<std::vector<float>, std::vector<float>> getFeatureSplitRange() const { return m_SplitRange; }
-		std::pair<std::vector<std::vector<float>>, std::vector<float>> getBootstrapDataset() const { return m_BootstrapDataset; }//add-3.20-gss
+		std::pair<std::vector<std::vector<float>>, std::vector<float>> getBootstrapDataset() const { return m_BootstrapDataset; }
 		
 	protected:
 		float _calculateVariance(const std::vector<float>& vNumVec);
@@ -63,10 +63,10 @@ namespace hiveRegressionForest
 		unsigned int m_BestSplitFeatureIndex = 0;
 		float m_BestGap = FLT_MAX;
 		unsigned int m_NodeSize = 0;
-		std::pair<std::vector<std::vector<float>>, std::vector<float>> m_BootstrapDataset;//add-3.20-gss
+		std::pair<std::vector<std::vector<float>>, std::vector<float>> m_BootstrapDataset;
 
 		std::pair<std::vector<float>, std::vector<float>> m_SplitRange;
-		std::pair<std::vector<float>, std::vector<float>> m_FeatureRange; //11.27-gss
+		std::pair<std::vector<float>, std::vector<float>> m_FeatureRange;
 
 		CNode* m_pLeftChild = nullptr;
 		CNode* m_pRightChild = nullptr;

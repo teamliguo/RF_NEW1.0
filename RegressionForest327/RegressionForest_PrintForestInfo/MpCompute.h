@@ -20,7 +20,7 @@ namespace hiveRegressionForest
 		std::pair<int, float>	calMinMPAndIndex(const CTree* vTree, const std::vector<int>& vDataIndex, const std::vector<float>& vFeature);
 
 	private:
-		void					__countIntervalNode(const CTree* vTree, const std::vector<std::pair<float, float>>& vMaxMinValue, std::vector<int>& voIntervalCount, std::vector<std::pair<float, float>>& voInterResponseRange);
+		void					__countIntervalNode(const CTree* vTree, const std::vector<std::pair<float, float>>& vMaxMinValue, std::vector<int>& voIntervalCount, std::vector<std::pair<float, float>>& voIntervalResponseRange);
 		float					__calMPValue(const CTree* vTree, const std::vector<std::pair<float, float>>& vMaxMinValue);
 	};
 }

@@ -196,7 +196,7 @@
     <ClInclude Include="VariancePredictionMethod.h" />
     <ClInclude Include="WeightedBootstrapSelector.h" />
     <ClInclude Include="WeightedFeatureSelector.h" />
-    <ClInclude Include="WeightedPathNodeMethod.h" />
+    <ClInclude Include="PathNodeMethod.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseFeatureSelector.cpp" />
@@ -232,7 +232,7 @@
     <ClCompile Include="VariancePredictionMethod.cpp" />
     <ClCompile Include="WeightedBootstrapSelector.cpp" />
     <ClCompile Include="WeightedFeatureSelector.cpp" />
-    <ClCompile Include="WeightedPathNodeMethod.cpp" />
+    <ClCompile Include="PathNodeMethod.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

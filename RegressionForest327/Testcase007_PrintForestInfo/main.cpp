@@ -84,29 +84,8 @@ void main()
 		std::vector<float> PredictSet(TestFeatureSet.size(), 0.0f);
 		std::vector<float> MPPredictSet(TestFeatureSet.size(), 0.0f);
 		clock_t PredictStart = clock();
-		bool IsPrint = CTrainingSetConfig::getInstance()->getAttribute<bool>(hiveRegressionForest::KEY_WORDS::IS_PRINT_LEAF_NODE);
-		for (auto Index = 0; Index < TestFeatureSet.size(); ++Index)
-		{
-			if (IsPrint)
-			{
-				std::ofstream BestTreeFile(CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BEST_TREE_PATH), std::ios::app);
-				std::ofstream BadTreeFile(CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BAD_TREE_PATH), std::ios::app);
-				BestTreeFile << "TEST " << Index << ",";
-				BadTreeFile << "TEST " << Index << ",";
-				for (int i = 0; i < TestFeatureSet[Index].size(); i++)
-				{
-					BestTreeFile << TestFeatureSet[Index][i] << ",";
-					BadTreeFile << TestFeatureSet[Index][i] << ",";
-				}
-				BestTreeFile << TestResponseSet[Index] << std::endl;
-				BadTreeFile << TestResponseSet[Index] << std::endl;
-				BestTreeFile.close();
-				BadTreeFile.close();
-			}
-			std::cout << "Test " << Index << std::endl;
-			PredictSet[Index] = hiveRegressionForest::hivePredict(TestFeatureSet[Index], TestResponseSet[Index], ForestId, MPPredictSet[Index], false);
-		}
-
+	
+		PredictSet = hiveRegressionForest::hivePredict(TestFeatureSet, TestResponseSet, ForestId);
 		clock_t PredictEnd = clock();
 		_LOG_("Predict Finished in " + std::to_string(PredictEnd - PredictStart) + " milliseconds.");
 
@@ -122,16 +101,12 @@ void main()
 
 		std::vector<float> BiasSet(TestFeatureSet.size(), 0.0f);
 		std::vector<float> BiasRateSet(TestFeatureSet.size(), 0.0f);
-		std::vector<float> MPBiasSet(TestFeatureSet.size(), 0.0f);
-		std::vector<float> MPBiasRateSet(TestFeatureSet.size(), 0.0f);
 		std::vector<std::pair<int, float>> BiasRateIndex;
 
 		for (int i = 0; i < TestFeatureSet.size(); ++i)
 		{
 			BiasSet[i] = std::abs(PredictSet[i] - TestResponseSet[i]);
 			BiasRateSet[i] = BiasSet[i] / TestResponseSet[i];
-			MPBiasSet[i] = std::abs(MPPredictSet[i] - TestResponseSet[i]);
-			MPBiasRateSet[i] = MPBiasSet[i] / TestResponseSet[i];
 			BiasRateIndex.push_back(std::make_pair(i, BiasRateSet[i]));
 		}
 
@@ -144,7 +119,7 @@ void main()
 			int PrintDataSize = CTrainingSetConfig::getInstance()->getAttribute<int>(hiveRegressionForest::KEY_WORDS::NEW_FILE_DATA_SIZE);
 			_ASSERTE(PrintDataSize <= BiasRateIndex.size());
 
-			for (int i = 2000; i < 2000+PrintDataSize; i++)
+			for (int i = 2000; i < 2000 + PrintDataSize; i++)
 			{
 				int FrontIndex = BiasRateIndex[i].first;
 				int LastIndex = BiasRateIndex[BiasRateIndex.size() - 1 - i].first;
@@ -176,13 +151,9 @@ void main()
 		calAccuracyByBiasRate(BiasRateSet, BiasRateVec, AccuracyVecByBiasRate);
 		float MSE = calMSE(BiasSet);
 		float R2Score = calR2Score(TestResponseSet, PredictSet);
-		float MPMSE = calMSE(MPBiasSet);
-		float MPR2Score = calR2Score(TestResponseSet, MPPredictSet);
 
 		std::cout << "MSE " << MSE << std::endl;
 		std::cout << "R2Score " << R2Score << std::endl;
-		std::cout << "MP MSE: " << MPMSE << std::endl;
-		std::cout << "MP R2Score: " << MPR2Score << std::endl;
 
 		std::ofstream StatisticalResultFile(CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::STATISTICAL_RESULT_PATH));
 		_ASSERTE(StatisticalResultFile.is_open());
@@ -190,8 +161,7 @@ void main()
 		StatisticalResultFile << "Sum bias rate: " << SumBiasRate << std::endl;
 		StatisticalResultFile << "MSE:" << MSE << std::endl;
 		StatisticalResultFile << "R2Score:" << R2Score << std::endl;
-		StatisticalResultFile << "MP MSE: " << MPMSE << std::endl;
-		StatisticalResultFile << "MP R2Score: " << MPR2Score << std::endl;
+
 		for (auto i = 0; i < AccuracyVecByThreshold.size(); i++)
 		{
 			StatisticalResultFile << "Accuracy of bias < " << ThresholdVec[i] << " : " << AccuracyVecByThreshold[i] << std::endl;

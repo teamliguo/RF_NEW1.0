@@ -66,7 +66,7 @@ float CMpCompute::calMPDissimilarityGlobal(const CTree* vTree, const std::vector
 
 //****************************************************************************************************
 //FUNCTION:
-float CMpCompute::calMPOutOfFeatureAABB(const CTree * vTree, const CNode * vNode, const std::vector<float>& vFeature)
+float CMpCompute::calMPOutOfFeatureAABB(const CTree* vTree, const CNode* vNode, const std::vector<float>& vFeature)
 {
 	std::pair<std::vector<float>, std::vector<float>> FeatureRange = vNode->getFeatureRange();
 	std::vector<std::pair<float, float>> MaxMinValue;
@@ -82,8 +82,6 @@ float CMpCompute::calMPOutOfFeatureAABB(const CTree * vTree, const CNode * vNode
 
 	return __calMPValue(vTree, MaxMinValue);
 }
-
-
 
 //****************************************************************************************************
 //FUNCTION:
@@ -104,7 +102,7 @@ void CMpCompute::generateSortedFeatureResponsePairSet(const std::vector<std::vec
 
 //****************************************************************************************************
 //FUNCTION:
-void CMpCompute::__countIntervalNode(const CTree * vTree, const std::vector<std::pair<float, float>>& vMaxMinValue, std::vector<int>& voIntervalCount, std::vector<std::pair<float, float>>& voInterResponseRange)
+void CMpCompute::__countIntervalNode(const CTree * vTree, const std::vector<std::pair<float, float>>& vMaxMinValue, std::vector<int>& voIntervalCount, std::vector<std::pair<float, float>>& voIntervalResponseRange)
 {
 	std::vector<std::vector<std::pair<float, float>>> SortedFeatureResponsePairSet = vTree->getSortedFeatureResponsePairSet();
 	for (int i = 0; i < vMaxMinValue.size(); i++)
@@ -112,7 +110,7 @@ void CMpCompute::__countIntervalNode(const CTree * vTree, const std::vector<std:
 		std::vector<float> IntervalResponses = calSecondParRange(vMaxMinValue[i].first, vMaxMinValue[i].second, SortedFeatureResponsePairSet[i]);
 		float MinResponse = *std::min_element(IntervalResponses.begin(), IntervalResponses.end());
 		float MaxResponse = *std::max_element(IntervalResponses.begin(), IntervalResponses.end());
-		voInterResponseRange[i] = std::make_pair(MinResponse, MaxResponse);
+		voIntervalResponseRange[i] = std::make_pair(MinResponse, MaxResponse);
 		voIntervalCount[i] = IntervalResponses.size();
 	}
 }

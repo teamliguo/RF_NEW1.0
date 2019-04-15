@@ -29,7 +29,8 @@ namespace hiveRegressionForest
 		bool    operator==(const CRegressionForest& vRegressionForest) const;
 		bool    isForestBuilt() const { return m_Trees.size() != 0; }
 		int     getNumOfTrees() const { return m_Trees.size(); }
-		std::vector<float>    predict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet, unsigned int vTreeNum) const;
+		std::vector<float> predict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet) const;
+		const   std::vector<CTree*>& getTreeSet() const { return m_Trees; }
 
 	private:
 		float __predictCertainResponse(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vResponseIndex = 0) const;

@@ -1,13 +1,14 @@
 #pragma once
 #include "common/BaseProduct.h"
+#include "Tree.h"
 
 namespace hiveRegressionForest
 {
-	class IPredictionMethod : public hiveOO::CBaseProduct
+	class IBasePredictionMethod : public hiveOO::CBaseProduct
 	{
 	public:
-		IPredictionMethod() {}
-		virtual ~IPredictionMethod() {}
-		virtual float predictCertainResponseV(const std::vector<float>& vTestFeatureInstance, float vTestResponse, unsigned int vTreeNumber) = 0;
+		IBasePredictionMethod() {}
+		virtual ~IBasePredictionMethod() {}
+		virtual float predictCertainResponseV(const std::vector<float>& vTestFeatureInstance, float vTestResponse, const std::vector<CTree*>& vTreeSet) = 0;
 	};
 }

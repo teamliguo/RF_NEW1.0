@@ -32,14 +32,14 @@ unsigned int hiveRegressionForest::hiveBuildRegressionForest(const std::string& 
 
 //******************************************************************************
 //FUNCTION:  for single response
-std::vector<float> hiveRegressionForest::hivePredict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet, unsigned vForestId)
+std::vector<float> hiveRegressionForest::hivePredict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet, unsigned int vForestId)
 {
 	_ASSERT(!vTestFeatureSet.empty() && !vTestResponseSet.empty());
 
 	const CRegressionForest* pRegressionForest = CRegressionForestPool::getInstance()->fetchForest(vForestId);
 	_ASSERTE(pRegressionForest);
 
-	return pRegressionForest->predict(vTestFeatureSet, vTestResponseSet, pRegressionForest->getNumOfTrees());
+	return pRegressionForest->predict(vTestFeatureSet, vTestResponseSet);
 }
 
 //****************************************************************************************************

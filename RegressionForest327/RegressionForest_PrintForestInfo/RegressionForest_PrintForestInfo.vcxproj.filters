@@ -96,9 +96,6 @@
     <ClInclude Include="MpCompute.h">
       <Filter>MpMethod</Filter>
     </ClInclude>
-    <ClInclude Include="WeightedPathNodeMethod.h">
-      <Filter>PathPredict</Filter>
-    </ClInclude>
     <ClInclude Include="Utility.h" />
     <ClInclude Include="BasePredictionMethod.h">
       <Filter>PredictionMethod</Filter>
@@ -117,6 +114,9 @@
     </ClInclude>
     <ClInclude Include="VariancePredictionMethod.h">
       <Filter>PredictionMethod</Filter>
+    </ClInclude>
+    <ClInclude Include="PathNodeMethod.h">
+      <Filter>PathPredict</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -229,9 +229,6 @@
     <ClCompile Include="MpCompute.cpp">
       <Filter>MpMethod</Filter>
     </ClCompile>
-    <ClCompile Include="WeightedPathNodeMethod.cpp">
-      <Filter>PathPredict</Filter>
-    </ClCompile>
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="InternalNodePredictionMethod.cpp">
       <Filter>PredictionMethod</Filter>
@@ -247,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="VariancePredictionMethod.cpp">
       <Filter>PredictionMethod</Filter>
+    </ClCompile>
+    <ClCompile Include="PathNodeMethod.cpp">
+      <Filter>PathPredict</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

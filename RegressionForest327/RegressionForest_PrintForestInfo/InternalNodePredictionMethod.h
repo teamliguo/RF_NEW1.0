@@ -3,12 +3,12 @@
 
 namespace hiveRegressionForest
 {
-	class CInternalNodePredictionMethod : public IPredictionMethod
+	class CInternalNodePredictionMethod : public IBasePredictionMethod
 	{
 	public:
 		CInternalNodePredictionMethod() {};
 		~CInternalNodePredictionMethod() {};
 
-		virtual float predictCertainResponseV(const std::vector<float>& vTestFeatureInstance, float vTestResponse, unsigned int vTreeNumber) override;
+		virtual float predictCertainResponseV(const std::vector<float>& vTestFeatureInstance, float vTestResponse, const std::vector<CTree*>& vTreeSet) override;
 	};
 }
