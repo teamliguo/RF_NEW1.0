@@ -15,9 +15,9 @@ namespace hiveRegressionForest
 		virtual void createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) override;
 		virtual void createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, const std::vector<int>& vDataSetIndex, const std::pair<int, int>& vIndexRange) override;
 		virtual float predictV(const std::vector<float>& vFeatureInstance, unsigned int vResponseIndex) const override;
+
 		virtual float getNodeMeanV(unsigned int vResponseIndex = 0) const override;
-		virtual void calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) override;
-		virtual std::vector<int> getNodeDataIndexV() const override;
+		virtual void  calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) override; 
 
 	protected:
 		virtual float getNodeVarianceV(unsigned int vResponseIndex = 0) const override;
@@ -25,7 +25,6 @@ namespace hiveRegressionForest
 	private:
 		float m_NodeVariance = 0.0f;
 		float m_NodeMean = 0.0f; 
-		std::vector<int> m_DataSetIndex;
 		hiveRegressionAnalysis::IBaseRegression* m_pRegressionModel = nullptr;
 
 	private:

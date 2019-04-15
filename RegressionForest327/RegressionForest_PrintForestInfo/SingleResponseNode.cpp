@@ -91,10 +91,3 @@ void CSingleResponseNode::calStatisticsV(const std::pair<std::vector<std::vector
 	m_NodeMean = _calculateMean(vBootstrapDataset.second);
 	m_FeatureRange = calFeatureRange(vBootstrapDataset.first);
 }
-
-//****************************************************************************************************
-//FUNCTION:
-std::vector<int> CSingleResponseNode::getNodeDataIndexV() const
-{
-	return m_DataSetIndex;
-}

@@ -93,6 +93,19 @@ float var(const std::vector<float>& vData)
 	{
 		Sum += (vData[i] - Mean)*(vData[i] - Mean);
 	}
+	return Sum/vData.size();
+}
+
+//******************************************************************************
+//FUNCTION:
+float calSumSquareError(const std::vector<float>& vData)
+{
+	float Sum = 0.f;
+	float Mean = mean(vData);
+	for (int i = 0; i < vData.size(); i++)
+	{
+		Sum += (vData[i] - Mean)*(vData[i] - Mean);
+	}
 	return Sum;
 }
 
@@ -116,5 +129,18 @@ float cov(const std::vector<float>& vDataA, const std::vector<float>& vDataB)
 float samplePearsonCorrelationCoefficient(const std::vector<float>& vDataA, const std::vector<float>&vDataB)
 {
 	_ASSERTE(vDataA.size() == vDataB.size());
-	return (cov(vDataA, vDataB)) / (sqrt(var(vDataA)*var(vDataB)));
+	return (cov(vDataA, vDataB)) / (sqrt(calSumSquareError(vDataA)*calSumSquareError(vDataB)));
 }
+
+//******************************************************************************
+//FUNCTION:
+void transpose(const std::vector<std::vector<float>>& vNativeMatrix, std::vector<std::vector<float>>& voTransposeMatrix)
+{
+	_ASSERTE(!vNativeMatrix.empty());
+	voTransposeMatrix.resize(vNativeMatrix[0].size());
+	for (auto i = 0; i < vNativeMatrix[0].size(); i++)
+		for (auto j = 0; j < vNativeMatrix.size(); j++)
+			voTransposeMatrix[i].push_back(vNativeMatrix[j][i]);
+    
+}
+

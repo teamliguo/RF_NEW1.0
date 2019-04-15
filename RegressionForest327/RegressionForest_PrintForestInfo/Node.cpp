@@ -64,14 +64,14 @@ bool CNode::setRightChild(CNode* vNode)
 
 //******************************************************************************
 //FUNCTION:
-void CNode::setSubEachFeatureSplitRange(std::pair<std::vector<float>, std::vector<float>>& vSplitRange)
+void CNode::setSubEachFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vSplitRange)
 {
 	m_SplitRange = vSplitRange;
 }
 
 //******************************************************************************
 //FUNCTION:
-void CNode::updataFeatureSplitRange(std::pair<std::vector<float>, std::vector<float>>& vParentRange, int vFeatureIndex, float vSplitLocaiton, bool vIsMin)
+void CNode::updataFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vParentRange, int vFeatureIndex, float vSplitLocaiton, bool vIsMin)
 {
 	m_SplitRange = vParentRange;
 	if (vIsMin)
@@ -86,9 +86,9 @@ void CNode::outputLeafNodeInfo(const std::string & vFilePath) const
 {
 	if (isLeafNode())
 	{
-		std::pair<std::vector<std::vector<float>>, std::vector<float>>& BootstrapDataset = getBootstrapDataset();
-		std::vector<std::vector<float>>& FeatureSet = BootstrapDataset.first;
-		std::vector<float>& ResponseSet = BootstrapDataset.second;
+		const std::pair<std::vector<std::vector<float>>, std::vector<float>>& BootstrapDataset = getBootstrapDataset();
+		const std::vector<std::vector<float>>& FeatureSet = BootstrapDataset.first;
+		const std::vector<float>& ResponseSet = BootstrapDataset.second;
 		_ASSERT(FeatureSet.size() == ResponseSet.size() && FeatureSet.size() != 0);
 		int DataNum = FeatureSet.size(), FeatureNum = FeatureSet[0].size();
 		std::ofstream PrintFile;
@@ -180,7 +180,7 @@ std::vector<float> CNode::calOutFeatureRange(const std::vector<float>& vFeatures
 std::vector<float> CNode::calOutFeatureSplitRange(const std::vector<float>& vFeatures) const
 {
 	std::vector<float> OutFeatureSplitRange(vFeatures.size());
-	std::pair<std::vector<float>, std::vector<float>> LeafFeatureSet = getFeatureSplitRange();
+	const std::pair<std::vector<float>, std::vector<float>> LeafFeatureSet = getFeatureSplitRange();
 	for (auto i = 0; i < LeafFeatureSet.first.size(); i++)
 	{
 		if (vFeatures[i] >= LeafFeatureSet.first[i] && vFeatures[i] <= LeafFeatureSet.second[i])

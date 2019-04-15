@@ -229,7 +229,7 @@ float CPathNodeMethod::traverWithDistanceFromFeaturesCentre(const CTree* vTree, 
 float CPathNodeMethod::predictWithMonteCarlo(const CNode& vCurLeafNode, const std::vector<float>& vFeature)
 {
 	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
-	std::vector<int> DataIndex = (const_cast<CNode*>(&vCurLeafNode))->getNodeDataIndexV();
+	std::vector<int> DataIndex = (const_cast<CNode*>(&vCurLeafNode))->getNodeDataIndex();
 	sort(DataIndex.begin(), DataIndex.end());
 
 	std::vector<float> Weights(DataIndex.size(), 0);
@@ -309,7 +309,7 @@ bool CPathNodeMethod::__isOneMoreOutBoundRange(const std::vector<float>& vTestPo
 std::vector<int> CPathNodeMethod::__calInternalNodeDataIndex(const CNode* vNode)
 {
 	if (vNode->isLeafNode())
-		return vNode->getNodeDataIndexV();
+		return vNode->getNodeDataIndex();
 	const CNode* LeftNode = const_cast<CNode*>(&vNode->getLeftChild());
 	const CNode* RightNode = const_cast<CNode*>(&vNode->getRightChild());
 	std::vector<int> LeftDataIndex = __calInternalNodeDataIndex(LeftNode);
@@ -340,7 +340,7 @@ float CPathNodeMethod::predictWithMinMPOnWholeDimension(const CTree* vTree, cons
 		{
 			if (pCurrentNode->isLeafNode())
 			{
-				std::pair<int, float> MinMPAndIndex = pMpCompute->calMinMPAndIndex(vTree, pCurrentNode->getNodeDataIndexV(), vFeature);
+				std::pair<int, float> MinMPAndIndex = pMpCompute->calMinMPAndIndex(vTree, pCurrentNode->getNodeDataIndex(), vFeature);
 				return pTrainingSet->getResponseValueAt(MinMPAndIndex.first);
 			}
 			NodeStack.pop();
@@ -351,7 +351,7 @@ float CPathNodeMethod::predictWithMinMPOnWholeDimension(const CTree* vTree, cons
 		}
 		else
 		{
-			std::vector<int> DataIndex = pCurrentNode->isLeafNode() ? pCurrentNode->getNodeDataIndexV() : __calInternalNodeDataIndex(pCurrentNode);
+			std::vector<int> DataIndex = pCurrentNode->isLeafNode() ? pCurrentNode->getNodeDataIndex() : __calInternalNodeDataIndex(pCurrentNode);
 			std::pair<int, float> MinMPAndIndex = pMpCompute->calMinMPAndIndex(vTree, DataIndex, vFeature);
 			return pTrainingSet->getResponseValueAt(MinMPAndIndex.first);
 		}

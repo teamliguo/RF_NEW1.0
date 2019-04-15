@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F5A0EE47-84F4-48A8-9389-54294AE408F8}</ProjectGuid>
+    <ProjectGuid>{79FE5442-D28E-4CF2-8F98-58A8764A28BC}</ProjectGuid>
     <RootNamespace>RegressionForest</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>

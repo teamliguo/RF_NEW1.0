@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B83E663F-F67A-4308-A6C6-CB437896475E}</ProjectGuid>
+    <ProjectGuid>{62CD8CC6-B2C4-45D4-B4FC-68AA79E3D266}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Experiment</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>

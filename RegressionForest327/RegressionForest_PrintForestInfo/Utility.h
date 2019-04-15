@@ -7,8 +7,10 @@ float calMSE(const std::vector<float>& vDeviateData);
 float calR2Score(const std::vector<float>& vTestResponseSet, const std::vector<float>& vPredictSet);
 float mean(const std::vector<float>& vData);
 float var(const std::vector<float>& vData);
+float calSumSquareError(const std::vector<float>& vData);
 float cov(const std::vector<float>& vDataA, const std::vector<float>& vDataB);
 float samplePearsonCorrelationCoefficient(const std::vector<float>& vDataA, const std::vector<float>&vDataB);
+void transpose(const std::vector<std::vector<float>>& vNativeMatrix, std::vector<std::vector<float>>& voTransposeMatrix);
 
 template<class T1, class T2>
 std::vector<T2> calSecondParRange(T1 vMin, T1 vMax, const std::vector<std::pair<T1, T2>>& vData)

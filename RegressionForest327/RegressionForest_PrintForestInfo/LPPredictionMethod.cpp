@@ -24,14 +24,13 @@ float CLPPredictionMethod::predictCertainResponseV(const std::vector<float>& vTe
 		EuclideanDistance[i] = 1.0 / (__calEuclideanDistance(LeafNodeSet[i]->getFeatureRange(), vTestFeatureInstance) + 1e-6);
 		PredictValue += PredictValueOfTree[i] * EuclideanDistance[i];
 	}
-
 	float WeightSum = std::accumulate(EuclideanDistance.begin(), EuclideanDistance.end(), 0.0f);
 	return PredictValue / WeightSum;
 }
 
 //****************************************************************************************************
 //FUNCTION:
-float CLPPredictionMethod::__calEuclideanDistance(std::pair<std::vector<float>, std::vector<float>>& vFeatureRange, const std::vector<float>& vTestFeatureInstance)
+float CLPPredictionMethod::__calEuclideanDistance(const std::pair<std::vector<float>, std::vector<float>>& vFeatureRange, const std::vector<float>& vTestFeatureInstance)
 {
 	float EuclideanDistance = 0.f;
 	for (int i = 0; i < vTestFeatureInstance.size(); ++i)

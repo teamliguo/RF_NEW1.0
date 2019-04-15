@@ -611,8 +611,8 @@ void CTree::printYRangeWithLeafXRange(const std::vector<float>& vFeatures, const
 	std::ofstream PrintFile(vFilePath, std::ios::app);
 	if (PrintFile.is_open())
 	{
-		std::pair<std::vector<float>, std::vector<float>>& FeatureRange = vNode->getFeatureRange();
-		std::pair<std::vector<float>, std::vector<float>>& SplitFeatureRange = vNode->getFeatureSplitRange();
+		const std::pair<std::vector<float>, std::vector<float>>& FeatureRange = vNode->getFeatureRange();
+		const std::pair<std::vector<float>, std::vector<float>>& SplitFeatureRange = vNode->getFeatureSplitRange();
 		std::pair<std::vector<float>, std::vector<float>> OutRange;
 		std::vector<float> ResponseVar, SplitRangeVar, OutSplitRangeVar;
 		std::vector<std::pair<float, float>> ResponseRange, SplitResponseRange, OutResponseRange;
@@ -688,7 +688,7 @@ void CTree::printResponseInfoInAABB(const std::vector<float>& vFeatures, const s
 		std::pair<std::vector<std::vector<float>>, std::vector<float>> TreeBootstrapDataset;
 		CTrainingSet::getInstance()->recombineBootstrapDataset(TreeBootstrapIndex, std::make_pair(0, TreeBootstrapIndex.size()), TreeBootstrapDataset);
 		std::pair<std::vector<float>, std::vector<float>> FeatureRange;
-		std::vector<std::vector<float>>& Dataset = vNode->getBootstrapDataset().first;
+		const std::vector<std::vector<float>>& Dataset = vNode->getBootstrapDataset().first;
 		for (int i = 0; i < vFeatures.size(); i++)
 		{
 			FeatureRange.first.push_back(std::min(vFeatures[i], Dataset[0][i]));
@@ -707,7 +707,7 @@ void CTree::printResponseInfoInAABB(const std::vector<float>& vFeatures, const s
 					std::cout << TreeBootstrapDataset.first[ResponseIndex[i]][k] << ", ";
 				std::cout << std::endl;
 			}
-			float ResponseVar = var(ResponseSet) / ResponseSet.size();
+			float ResponseVar = calSumSquareError(ResponseSet) / ResponseSet.size();
 			std::cout << ResponseVar << std::endl;
 			PrintFile << "Num:" << "," << ResponseSet.size() << "," << "Var:" << "," << ResponseVar << std::endl;
 		}
@@ -728,7 +728,7 @@ std::vector<int> CTree::calFeatureRangeResponse(const std::pair<std::vector<floa
 		float MinResponse = *std::min_element(InterResponse.begin(), InterResponse.end());
 		float MaxResponse = *std::max_element(InterResponse.begin(), InterResponse.end());
 		voResponseRange.push_back(std::make_pair(MinResponse, MaxResponse));
-		float ResponseVar = var(InterResponse);
+		float ResponseVar = calSumSquareError(InterResponse);
 		voResponseVariance.push_back(ResponseVar / InterResponse.size());
 		InterResponseNum.push_back(InterResponse.size());
 

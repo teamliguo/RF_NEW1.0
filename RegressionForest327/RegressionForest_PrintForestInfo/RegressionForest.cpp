@@ -14,9 +14,9 @@
 #include "BaseInstanceWeightMethod.h"
 #include "RegressionForestConfig.h"
 #include "RegressionForestCommon.h"
-#include "PathNodeMethod.h"
-#include "MpCompute.h"
+#include "WeightedPathNodeMethod.h"
 #include "BasePredictionMethod.h"
+#include "MpCompute.h"
 
 using namespace hiveRegressionForest;
 
@@ -78,13 +78,15 @@ void CRegressionForest::buildForest(const std::string& vConfigFile)
 std::vector<float> CRegressionForest::predict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet) const
 {
 	_ASSERTE(!vTestFeatureSet.empty() && !vTestResponseSet.empty());
-	IBasePredictionMethod* pPredictionMethod = dynamic_cast<IBasePredictionMethod*>(hiveOO::CProductFactoryData::getInstance()->createProduct(CRegressionForestConfig::getInstance()->getAttribute<std::string>(KEY_WORDS::PREDICTION_METHOD)));
+	std::string PredictionMethodSig = CRegressionForestConfig::getInstance()->getAttribute<std::string>(KEY_WORDS::PREDICTION_METHOD);
+	IBasePredictionMethod* pPredictionMethod = dynamic_cast<IBasePredictionMethod*>(hiveOO::CProductFactoryData::getInstance()->createProduct(PredictionMethodSig));
+	_ASSERTE(pPredictionMethod);
 	std::vector<CTree*> TreeSet = getTreeSet();
 	std::vector<float> PredictionSet(vTestFeatureSet.size());
+	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
+
 	for (auto i = 0; i < vTestFeatureSet.size(); i++)
-	{
 		PredictionSet[i] = pPredictionMethod->predictCertainResponseV(vTestFeatureSet[i], vTestResponseSet[i], TreeSet);
-	}
 	return PredictionSet;
 }
 
@@ -213,7 +215,7 @@ float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFea
 	std::vector<std::vector<SPathNodeInfo>> AllTreePath(vNumOfUsingTrees);
 	std::vector<std::vector<float>> OutLeafFeatureRange(vNumOfUsingTrees);
 	std::vector<std::vector<float>> OutLeafFeatureSplitRange(vNumOfUsingTrees);
-	CPathNodeMethod* pWeightedPathNode = CPathNodeMethod::getInstance();
+	CWeightedPathNodeMethod* pWeightedPathNode = CWeightedPathNodeMethod::getInstance();
 	CMpCompute* pMpCompute = nullptr;
 	bool IsPrint =  CTrainingSetConfig::getInstance()->getAttribute<bool>(hiveRegressionForest::KEY_WORDS::IS_PRINT_LEAF_NODE);
 	for (int i = 0; i < vNumOfUsingTrees; ++i)
