@@ -31,7 +31,7 @@ float CVariancePredictionMethod::predictCertainResponseV(const std::vector<float
 			TreeResponseSet.push_back(pTrainingSet->getResponseValueAt(iter));
 		}
 		TreeResponseVar[i] = var(TreeResponseSet);
-		__calVarChangedRatio(TreeFeatureSet, vTestFeatureInstance, TreeFeatureVar[i], TreeFeatureVarRatio[i]);
+		__calVarChangedRatio(TreeFeatureSet, vTestFeatureInstance, TreeFeatureVar[i], TreeFeatureVarRatio[i]);//当前这棵树的各个特征方差，现在存储的是一个16维的条目
 	}
 	std::vector<float> WeightByTreeResponseVar = __calWeightByResponseVar(TreeResponseVar, -1);//元素个数为树的数量
 	std::vector<std::vector<float>> WeightByTreeFeatureVar = __calTreeWeightByFeatureVar(TreeFeatureVar, -1);//若有N颗树，则有N个向量，
@@ -40,7 +40,7 @@ float CVariancePredictionMethod::predictCertainResponseV(const std::vector<float
 	float SumOfWeightPrediction = 0.f;
 	for (auto i = 0; i < FinalWeight.size(); i++)
 		SumOfWeightPrediction += FinalWeight[i] * PredictValueOfTree[i];
-	return SumOfWeightPrediction / vTreeSet.size();
+	return SumOfWeightPrediction / std::accumulate(FinalWeight.begin(), FinalWeight.end(), 0.f);
 }
 
 //******************************************************************************
@@ -48,7 +48,7 @@ float CVariancePredictionMethod::predictCertainResponseV(const std::vector<float
 void CVariancePredictionMethod::__calVarChangedRatio(const std::vector<std::vector<float>>& vData, const std::vector<float>& vAddValue, std::vector<float>& voNativeVar, std::vector<float>& voChangedRatio)
 {
 	_ASSERTE(!vData.empty() && !vAddValue.empty());
-	std::vector<float> FeatureSum(vData[0].size()), FeatureWithNewDataSum(vData[0].size());
+	std::vector<float> FeatureSum(vData[0].size(), 0.f), FeatureWithNewDataSum(vData[0].size(), 0.f);//初始化，改i，k
 	voNativeVar.resize(vData[0].size(), 0.f);
 	voChangedRatio.resize(vData[0].size(), 0.f);
 	for (auto i = 0; i < vData[0].size(); i++)
@@ -60,10 +60,13 @@ void CVariancePredictionMethod::__calVarChangedRatio(const std::vector<std::vect
 	for (auto k = 0; k < vData[0].size(); k++)
 	{
 		for (auto j = 0; j < vData.size(); j++)
+		{
 			voNativeVar[k] += pow(vData[j][k] - FeatureSum[k] / vData.size(), 2);
-		voChangedRatio[k] += voNativeVar[k] + pow(vAddValue[k] - FeatureWithNewDataSum[k] / (vData[0].size() + 1), 2);
+			voChangedRatio[k] += pow(vData[j][k] - FeatureWithNewDataSum[k] / (vData.size() + 1), 2);
+		}
+		voChangedRatio[k] += pow(vAddValue[k] - FeatureWithNewDataSum[k] / (vData.size() + 1), 2);
 		voNativeVar[k] /= vData.size();
-		voChangedRatio[k] /= (vData.size() + 1);
+		voChangedRatio[k] = abs(voChangedRatio[k] / (vData.size() + 1) - voNativeVar[k]);
 	}
 }
 
@@ -71,7 +74,7 @@ void CVariancePredictionMethod::__calVarChangedRatio(const std::vector<std::vect
 //FUNCTION:
 std::vector<float> CVariancePredictionMethod::__calWeightByResponseVar(const std::vector<float>& vTreeVar, int vParadigmValue)
 {
-	_ASSERTE(!vInputVar.empty());
+	_ASSERTE(!vTreeVar.empty());
 	std::vector<float> TreeWeight;
 	float SumOfTreeWeight = 0.0f, SubstituteOfZero = FLT_MAX;
 	for (auto iter : vTreeVar)
@@ -96,7 +99,7 @@ std::vector<std::vector<float>> CVariancePredictionMethod::__calTreeWeightByFeat
 	std::vector<std::vector<float>> WeigthByFeatureVar(vFeatureVar[0].size()), TransWeight;
 	std::vector<std::vector<float>> TransposeFeature;
 	transpose(vFeatureVar, TransposeFeature);
-	for (auto i = 0; i < TransposeFeature.size(); i++)
+	for (auto i = 0; i < TransposeFeature.size(); i++)//第一个维度
 	{
 		WeigthByFeatureVar[i] = __calWeightByResponseVar(TransposeFeature[i], -1);
 	}
