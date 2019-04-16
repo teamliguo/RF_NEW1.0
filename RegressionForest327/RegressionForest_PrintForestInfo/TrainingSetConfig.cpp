@@ -27,9 +27,5 @@ void CTrainingSetConfig::__defineAcceptableAttributes()
 	defineAttribute(KEY_WORDS::NEW_FILE_DATA_SIZE,			hiveConfig::ATTRIBUTE_INT);
 	defineAttribute(KEY_WORDS::GOOD_TEST_FILE,				hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::BAD_TEST_FILE,				hiveConfig::ATTRIBUTE_STRING);
-	defineAttribute(KEY_WORDS::IS_PRINT_LEAF_NODE,			hiveConfig::ATTRIBUTE_BOOL);
-	defineAttribute(KEY_WORDS::PRINT_TREE_NUMBER,			hiveConfig::ATTRIBUTE_INT);
-	defineAttribute(KEY_WORDS::BEST_TREE_PATH,				hiveConfig::ATTRIBUTE_STRING);
-	defineAttribute(KEY_WORDS::BAD_TREE_PATH,				hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::OUT_DIMENSION,				hiveConfig::ATTRIBUTE_INT);
 }

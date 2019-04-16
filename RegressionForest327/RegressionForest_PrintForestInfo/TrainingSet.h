@@ -27,7 +27,6 @@ namespace hiveRegressionForest
 		float						getResponseValueAt(unsigned int vInstanceIndex, unsigned int vResponseIndex = 0) const { return m_pResponseSet[vInstanceIndex * m_NumResponse + vResponseIndex]; }
 		const std::vector<float>&	getFeatureInstanceAt(unsigned int vInstanceIndex) const { return m_FeatureSet[vInstanceIndex]; }
 		void						normalization(std::vector<std::vector<float>>& voFeatureSet);
-		const std::vector<float>&   getEachDimStandard() const { return m_EachDimStandard; }
 
 	private:
 		CTrainingSet();
@@ -35,16 +34,9 @@ namespace hiveRegressionForest
 		void __initTrainingSetConfig(const std::string& vConfig);
 		bool __loadSetFromBinaryFile(const std::string& vBinaryFile);
 		bool __loadSetFromCSVFile(const std::string& vCSVFile, bool vHeader);
-		void __calDimFeatures(const std::vector<std::vector<float>>& vFeatureDataSet, std::vector<std::vector<float>>& voDimFeatureDataSet);
-		void __calStandardDeviation(const std::vector<std::vector<float>>& vFeatureDataSet, std::vector<float>& voEachDimStandard);
-		void __calResponseRange();
-		void __calFeatureRange();
 
 		//NOTES : m_FeatureSet用二维vector存储，能尽量避免拷贝。m_ResponseSet用指针，应对单响应和多响应的情况, 且效率更高
 		std::vector<std::vector<float>>							m_FeatureSet;
-		std::vector<float>										m_EachDimStandard;
-		std::pair<float, float>									m_ResponseRange;
-		std::pair<std::vector<float>, std::vector<float>>		m_FeatureRange;
 		float*  m_pResponseSet	 = nullptr;
 		int		m_NumResponse    = 0;
 

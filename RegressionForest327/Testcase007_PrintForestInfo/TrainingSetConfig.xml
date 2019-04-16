@@ -16,11 +16,5 @@
 <GOOD_TEST_FILE> ../../DataSet/well_predicted_test_file_2000-2999.csv </GOOD_TEST_FILE>
 <BAD_TEST_FILE> ../../DataSet/worse_predicted_test_file_2000-2999.csv </BAD_TEST_FILE>
 
-<!--Print Tree info-->
-<IS_PRINT_LEAF_NODE> false </IS_PRINT_LEAF_NODE>
-<PRINT_TREE_NUMBER> 3 </PRINT_TREE_NUMBER>
-<BEST_TREE_PATH> ./BestTreeInfo.csv </BEST_TREE_PATH>
-<BAD_TREE_PATH> ./BadTreeInfo.csv </BAD_TREE_PATH>
-
 <!--Out Dimension Control-->
 <OUT_DIMENSION> 3 </OUT_DIMENSION>

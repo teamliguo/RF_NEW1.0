@@ -16,58 +16,17 @@ CMpCompute::~CMpCompute()
 float CMpCompute::computeMpOfTwoFeatures(const CTree* vTree, const std::vector<float>& vLeafDate, const std::vector<float>& vTestData, float vPredictResponse)
 {
 	std::vector<std::pair<float, float>> MaxMinValue;
-	CTrainingSet *pTrainingSet = CTrainingSet::getInstance();
 	for (int j = 0; j < vLeafDate.size(); j++)
-	{
-		float StandardDeviation = pTrainingSet->getEachDimStandard()[j];
-		MaxMinValue.push_back({ std::max(vLeafDate[j], vTestData[j]) + StandardDeviation, std::min(vLeafDate[j], vTestData[j]) - StandardDeviation });
-	}
+		MaxMinValue.push_back({ std::max(vLeafDate[j], vTestData[j]), std::min(vLeafDate[j], vTestData[j])});
 
 	return __calMPValue(vTree, MaxMinValue);
 }
 
 //****************************************************************************************************
 //FUNCTION:
-std::pair<int, float> CMpCompute::calMinMPAndIndex(const CTree* vTree, const std::vector<int>& vDataIndex, const std::vector<float>& vFeature)
-{
-	_ASSERT(!vDataIndex.empty());
-
-	float MinMP = FLT_MAX;
-	int MinMPIndex = vDataIndex[0];
-	std::vector<float> MP(vDataIndex.size(), 0.f);
-	CTrainingSet *pTrainingSet = CTrainingSet::getInstance();
-	for (int i = 0; i < vDataIndex.size(); ++i)
-	{
-		MP[i] = computeMpOfTwoFeatures(vTree, pTrainingSet->getFeatureInstanceAt(vDataIndex[i]), vFeature);
-		if (MP[i] < MinMP)
-		{
-			MinMP = MP[i];
-			MinMPIndex = vDataIndex[i];
-		}
-	}
-
-	return std::make_pair(MinMPIndex, MinMP);
-}
-
-//****************************************************************************************************
-//FUNCTION:
-float CMpCompute::calMPDissimilarityGlobal(const CTree* vTree, const std::vector<int>& vLeafIndex, const std::vector<float>& vFeature, float vPredictResponse)
-{
-	float SumMP = 0.f;
-	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
-	for (int i = 0; i < vLeafIndex.size(); i++)
-	{
-		std::vector<float> LeafNodeFeatureValue = pTrainingSet->getFeatureInstanceAt(vLeafIndex[i]);
-		float MPValue = computeMpOfTwoFeatures(vTree, LeafNodeFeatureValue, vFeature, vPredictResponse);
-		SumMP += MPValue;
-	}
-	return SumMP / vLeafIndex.size();
-}
-
-//****************************************************************************************************
-//FUNCTION:
 float CMpCompute::calMPOutOfFeatureAABB(const CTree* vTree, const CNode* vNode, const std::vector<float>& vFeature)
 {
+	_ASSERTE(vTree && vNode && !vFeature.empty());
 	std::pair<std::vector<float>, std::vector<float>> FeatureRange = vNode->getFeatureRange();
 	std::vector<std::pair<float, float>> MaxMinValue;
 	for (int i = 0; i < vFeature.size(); ++i)

@@ -320,47 +320,6 @@ std::vector<int> CPathNodeMethod::__calInternalNodeDataIndex(const CNode* vNode)
 
 //****************************************************************************************************
 //FUNCTION:
-float CPathNodeMethod::predictWithMinMPOnWholeDimension(const CTree* vTree, const std::vector<float>& vFeature)
-{
-	_ASSERTE(vTree);
-	std::stack<const CNode*> NodeStack;
-	const CNode* TreeRoot = &vTree->getRoot();
-	NodeStack.push(TreeRoot);
-	CMpCompute* pMpCompute = nullptr;
-	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
-	int OutDimension = CTrainingSetConfig::getInstance()->getAttribute<int>(KEY_WORDS::OUT_DIMENSION);
-	while (!NodeStack.empty())
-	{
-		const CNode* pCurrentNode = NodeStack.top();
-		std::pair<std::vector<float>, std::vector<float>> FeatureRange = pCurrentNode->getFeatureRange();
-		if (OutDimension <= 0) OutDimension = 1;
-		if (OutDimension > vFeature.size()) OutDimension = vFeature.size();
-		bool IsInBox = __isOneMoreOutBoundRange(vFeature, FeatureRange.first, FeatureRange.second, OutDimension);
-		if (IsInBox)
-		{
-			if (pCurrentNode->isLeafNode())
-			{
-				std::pair<int, float> MinMPAndIndex = pMpCompute->calMinMPAndIndex(vTree, pCurrentNode->getNodeDataIndex(), vFeature);
-				return pTrainingSet->getResponseValueAt(MinMPAndIndex.first);
-			}
-			NodeStack.pop();
-			if (vFeature[pCurrentNode->getBestSplitFeatureIndex()] < pCurrentNode->getBestGap())
-				NodeStack.push(&pCurrentNode->getLeftChild());
-			else
-				NodeStack.push(&pCurrentNode->getRightChild());
-		}
-		else
-		{
-			std::vector<int> DataIndex = pCurrentNode->isLeafNode() ? pCurrentNode->getNodeDataIndex() : __calInternalNodeDataIndex(pCurrentNode);
-			std::pair<int, float> MinMPAndIndex = pMpCompute->calMinMPAndIndex(vTree, DataIndex, vFeature);
-			return pTrainingSet->getResponseValueAt(MinMPAndIndex.first);
-		}
-	}
-	_SAFE_DELETE(pMpCompute);
-}
-
-//****************************************************************************************************
-//FUNCTION:
 float CPathNodeMethod::prediceWithInternalNode(const CTree* vTree, const std::vector<float>& vFeature)
 {
 	_ASSERTE(vTree);

@@ -43,7 +43,6 @@ namespace hiveRegressionForest
 		void buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* vFeatureSelector, INodeSpliter* vNodeSpliter, IBaseTerminateCondition* vTerminateCondition, IFeatureWeightGenerator* vFeatureWeightMethod);
 		
 		const CNode* locateLeafNode(const std::vector<float>& vFeatures) const;
-		const CNode* recordPathNodeInfo(const std::vector<float>& vFeatures, std::vector<SPathNodeInfo>& voPathNodeInfo, std::vector<float>& voOutLeafFeature, std::vector<float>& voOutLeafSplitFeature, int vTreeId) const;
 		float predict(const CNode& vCurLeafNode, const std::vector<float>& vFeatures, float& voWeight, unsigned int vResponseIndex = 0) const;
 		
 		void fetchTreeInfo(STreeInfo& voTreeInfo) const;
@@ -52,21 +51,7 @@ namespace hiveRegressionForest
 		void setBootstrapIndex(std::vector<int>& vBootstrapIndex) { m_BootstrapIndex = vBootstrapIndex; }
 		const std::vector<int> getBootstrapIndex() const { return m_BootstrapIndex; }
 		const std::vector<std::vector<std::pair<float, float>>> getSortedFeatureResponsePairSet() const { return m_SortedFeatureResponsePairSet; }
-
 		bool operator==(const CTree& vTree) const;
-
-		float traversalPathPrediction(const std::vector<float>& vFeatures);
-		float calculateOutNodeBound(const std::vector<float>& vFeature, const std::pair<std::vector<float>, std::vector<float>>& vFeatureRange);
-		float traverWithDistanceFromFeatureRange(const std::vector<float>& vFeatures);
-		float traversePathWithFeatureCentre(const std::vector<float>& vFeatures);
-		float traverWithDistanceFromFeaturesCentre(const std::vector<float>& vFeatures);
-		float travelWithMonteCarlo(const std::vector<float>& vFeatures);
-		float computeCDF(float vFirst, float vSecond);
-		void printYRangeWithLeafXRange(const std::vector<float>& vFeatures, const std::string& vFilePath, const CNode* vNode) const;
-		void printResponseInfoInAABB(const std::vector<float>& vFeatures, const std::string& vFilePath, const CNode* vNode) const; 
-		std::vector<int> calFeatureRangeResponse(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, std::vector<std::pair<float, float>>& voResponseRange, std::vector<float>& voResponseVariance) const;
-		std::vector<std::vector<int>> calFeatureRangeIndex(const std::pair<std::vector<float>, std::vector<float>>& vLeafNodeFeatureRange, const std::vector<std::vector<float>>& vFeatureSet) const;
-		std::vector<int> calDupIndex(const std::vector<std::vector<int>>& vResponseIndex) const;
 	protected:
 		virtual void _selectCandidateFeaturesV(IFeatureSelector* vFeatureSelector, IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsUpdatingFeaturesWeight, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<int>& voCandidateFeaturesIndex);
 		

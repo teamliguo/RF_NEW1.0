@@ -22,12 +22,12 @@ namespace hiveRegressionForest
 		virtual float predictV(const std::vector<float>& vFeatureInstance, unsigned int vResponseIndex = 0) const { return FLT_MAX; }
 		virtual float getNodeMeanV(unsigned int vResponseIndex = 0) const { return FLT_MAX; } 
 		virtual float getNodeVarianceV(unsigned int vResponseIndex = 0) const { return FLT_MAX; }
-		virtual void  calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) {};
+		virtual void  calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) {}
+		virtual void  outputLeafNodeInfoV(const std::string& vFilePath) const {}
 		float         calculateNodeWeight(unsigned int vResponseIndex = 0) const;
 
+
 		std::pair<std::vector<float>, std::vector<float>> calFeatureRange(const std::vector<std::vector<float>>& vFeatureSet);
-		std::vector<float>                                calOutFeatureRange(const std::vector<float>& vFeatures) const;
-		std::vector<float>                                calOutFeatureSplitRange(const std::vector<float>& vFeatures) const;
 
 		bool			operator==(const CNode& vNode) const;
 		bool			isLeafNode() const { return m_IsLeafNode; }
@@ -38,9 +38,6 @@ namespace hiveRegressionForest
 		void			setLevel(unsigned int vLevel) { m_Level = vLevel; }
 		void			setNodeSize(unsigned int vNodeSize) { m_NodeSize = vNodeSize; }
 		void			setBestSplitFeatureAndGap(unsigned int vFeatureIndex, float vGap) { m_BestSplitFeatureIndex = vFeatureIndex; m_BestGap = vGap; }
-		void            setSubEachFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vSplitRange);
-		void            updataFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vParentRange, int vFeatureIndex, float vSplitLocaiton, bool vIsMin);
-		void            outputLeafNodeInfo(const std::string& vFilePath) const;
 
 		const CNode&	getLeftChild()				const { return *m_pLeftChild; }
 		const CNode&	getRightChild()				const { return *m_pRightChild; }
@@ -50,22 +47,14 @@ namespace hiveRegressionForest
 		unsigned int	getBestSplitFeatureIndex()	const { return m_BestSplitFeatureIndex; }
 
 		const std::pair<std::vector<float>, std::vector<float>>& getFeatureRange() const { return m_FeatureRange; } 
-		const std::pair<std::vector<float>, std::vector<float>>& getFeatureSplitRange() const { return m_SplitRange; }
-		const std::pair<std::vector<std::vector<float>>, std::vector<float>>& getBootstrapDataset() const { return m_BootstrapDataset; }
 		const std::vector<int>& getNodeDataIndex()const { return m_DataSetIndex; }
 
 	protected:
-		float _calculateVariance(const std::vector<float>& vNumVec);
-		float _calculateMean(const std::vector<float>& vNumVec);
-
 		bool m_IsLeafNode = false;
 		unsigned int m_Level = 0;
 		unsigned int m_BestSplitFeatureIndex = 0;
 		float m_BestGap = FLT_MAX;
 		unsigned int m_NodeSize = 0;
-		std::pair<std::vector<std::vector<float>>, std::vector<float>> m_BootstrapDataset;
-
-		std::pair<std::vector<float>, std::vector<float>> m_SplitRange;
 		std::pair<std::vector<float>, std::vector<float>> m_FeatureRange;
 		std::vector<int> m_DataSetIndex;
 		CNode* m_pLeftChild = nullptr;
@@ -83,8 +72,6 @@ namespace hiveRegressionForest
 			ar & m_pLeftChild;
 			ar & m_pRightChild;
 			ar & m_FeatureRange;
-			ar & m_SplitRange;
-			ar & m_BootstrapDataset;
 		}
 
 		friend class boost::serialization::access;

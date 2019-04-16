@@ -9,7 +9,7 @@
 #include "../RegressionForest_PrintForestInfo/TrainingSet.h"
 #include "../RegressionForest_PrintForestInfo/TrainingSetConfig.h"
 #include "../RegressionForest_PrintForestInfo/TrainingSetCommon.h"
-#include "../RegressionForest_PrintForestInfo/Utility.cpp"
+#include "../RegressionForest_PrintForestInfo/Utility.h"
 #include "ExtraConfig.h"
 #include "ExtraCommon.h"
 

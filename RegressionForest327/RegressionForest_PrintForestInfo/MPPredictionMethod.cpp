@@ -1,5 +1,7 @@
-#include "MPPredictionMethod.h"
 #include <numeric>
+#include <float.h>
+#include "common/HiveCommonMicro.h"
+#include "MPPredictionMethod.h"
 #include "RegressionForestCommon.h"
 #include "common/ProductFactory.h"
 #include "MpCompute.h"
@@ -24,10 +26,10 @@ float CMPPredictionMethod::predictCertainResponseV(const std::vector<float>& vTe
 	{
 		LeafNodeSet[i] = vTreeSet[i]->locateLeafNode(vTestFeatureInstance);
 		PredictValueOfTree[i] = vTreeSet[i]->predict(*LeafNodeSet[i], vTestFeatureInstance, NodeWeight[i]);
-		MPValue[i] = 1.0 / (pMPCompute->calMPOutOfFeatureAABB(vTreeSet[i], LeafNodeSet[i], vTestFeatureInstance) + 1e-6);
+		MPValue[i] = 1.0 / (pMPCompute->calMPOutOfFeatureAABB(vTreeSet[i], LeafNodeSet[i], vTestFeatureInstance) + FLT_EPSILON);
 		PredictValue += PredictValueOfTree[i] * MPValue[i];
 	}
-
+	_SAFE_DELETE(pMPCompute);
 	float WeightSum = std::accumulate(MPValue.begin(), MPValue.end(), 0.0f);
 	return PredictValue / WeightSum;
 }

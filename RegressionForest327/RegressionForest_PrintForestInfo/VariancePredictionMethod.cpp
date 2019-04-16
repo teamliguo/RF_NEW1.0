@@ -12,16 +12,17 @@ hiveOO::CProductFactory<CVariancePredictionMethod> theCreator(KEY_WORDS::VARIANC
 float CVariancePredictionMethod::predictCertainResponseV(const std::vector<float>& vTestFeatureInstance, float vTestResponse, const std::vector<CTree*>& vTreeSet)
 {
 	_ASSERTE(!vTestFeatureInstance.empty());
-	std::vector<float> PredictValueOfTree(vTreeSet.size());
-	std::vector<float> TreeResponseVar(vTreeSet.size());
-	std::vector<std::vector<float>> TreeFeatureVar(vTreeSet.size()), TreeFeatureVarRatio(vTreeSet.size());
+	int TreeNum = vTreeSet.size();
+	std::vector<float> PredictValueOfTree(TreeNum);
+	std::vector<float> TreeResponseVar(TreeNum);
+	std::vector<std::vector<float>> TreeFeatureVar(TreeNum), TreeFeatureVarRatio(TreeNum);
 	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
 #pragma omp parallel for
-	for (auto i = 0; i < vTreeSet.size(); i++)
+	for (auto i = 0; i < TreeNum; i++)
 	{
 		std::vector<float> TreeResponseSet;
 		std::vector<std::vector<float>> TreeFeatureSet;
-		std::vector<int> TreeResponseIndexSet, TreeFeatureIndexSet;
+		std::vector<int> TreeResponseIndexSet;
 		const CNode* CurrentLeafNode = vTreeSet[i]->locateLeafNode(vTestFeatureInstance);
 		PredictValueOfTree[i] = CurrentLeafNode->getNodeMeanV();
 		TreeResponseIndexSet = CurrentLeafNode->getNodeDataIndex();
@@ -76,16 +77,17 @@ std::vector<float> CVariancePredictionMethod::__calWeightByResponseVar(const std
 {
 	_ASSERTE(!vTreeVar.empty());
 	std::vector<float> TreeWeight;
-	float SumOfTreeWeight = 0.0f, SubstituteOfZero = FLT_MAX;
+	float SubstituteOfZero = FLT_MAX;
 	for (auto iter : vTreeVar)
-		SubstituteOfZero = (iter < SubstituteOfZero && iter != 0) ? iter : SubstituteOfZero;
+		if (iter > FLT_EPSILON && iter < SubstituteOfZero)
+			SubstituteOfZero = iter;
 	SubstituteOfZero -= FLT_EPSILON;
 	for (auto iter : vTreeVar)
 	{
-		float Temp = (iter != 0) ? pow(iter, vParadigmValue) : pow(SubstituteOfZero, vParadigmValue);
+		float Temp = (iter > FLT_EPSILON) ? pow(iter, vParadigmValue) : pow(SubstituteOfZero, vParadigmValue);
 		TreeWeight.push_back(Temp);
 	}
-	SumOfTreeWeight = std::accumulate(TreeWeight.begin(), TreeWeight.end(), 0.f);
+	float SumOfTreeWeight = std::accumulate(TreeWeight.begin(), TreeWeight.end(), 0.f);
 	for (auto i = 0; i < TreeWeight.size(); i++)
 		TreeWeight[i] /= SumOfTreeWeight;
 	return TreeWeight;
@@ -112,9 +114,10 @@ std::vector<std::vector<float>> CVariancePredictionMethod::__calTreeWeightByFeat
 std::vector<float> CVariancePredictionMethod::__calFinalWeight(const std::vector<std::vector<float>>& vWeigthByFeature, const std::vector<std::vector<float>>& vWeightByFeatureWithTest, const std::vector<float>& vWeightByResponse)
 {
 	_ASSERTE(!vWeightByResponse.empty() && !vWeightByFeatureWithTest.empty() && vWeigthByFeature.empty());
-	std::vector<float> FinalWeight(vWeigthByFeature.size());
-	std::vector<float> MeanOfFeatureWeight(vWeigthByFeature.size()), MeanOfFeatureWithTestVar(vWeigthByFeature.size());
-	for (auto i = 0; i < vWeigthByFeature.size(); i++)
+	int DataNum = vWeigthByFeature.size();
+	std::vector<float> FinalWeight(DataNum);
+	std::vector<float> MeanOfFeatureWeight(DataNum), MeanOfFeatureWithTestVar(DataNum);
+	for (auto i = 0; i < DataNum; i++)
 	{
 		MeanOfFeatureWithTestVar[i] = std::accumulate(vWeightByFeatureWithTest[i].begin(), vWeightByFeatureWithTest[i].end(), 0.f) / vWeightByFeatureWithTest[i].size();
 		MeanOfFeatureWeight[i] = std::accumulate(vWeigthByFeature[i].begin(), vWeigthByFeature[i].end(), 0.f) / vWeigthByFeature[i].size();

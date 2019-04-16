@@ -7,8 +7,6 @@
 #include "ObjectPool.h"
 #include "RegressionForestConfig.h"
 #include "RegressionForestCommon.h"
-#include <numeric>
-#include <fstream>
 
 using namespace hiveRegressionForest;
 
@@ -62,74 +60,6 @@ bool CNode::setRightChild(CNode* vNode)
 	return true;
 }
 
-//******************************************************************************
-//FUNCTION:
-void CNode::setSubEachFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vSplitRange)
-{
-	m_SplitRange = vSplitRange;
-}
-
-//******************************************************************************
-//FUNCTION:
-void CNode::updataFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vParentRange, int vFeatureIndex, float vSplitLocaiton, bool vIsMin)
-{
-	m_SplitRange = vParentRange;
-	if (vIsMin)
-		m_SplitRange.second[vFeatureIndex] = vSplitLocaiton;
-	else
-		m_SplitRange.first[vFeatureIndex] = vSplitLocaiton;
-}
-
-//******************************************************************************
-//FUNCTION:
-void CNode::outputLeafNodeInfo(const std::string & vFilePath) const
-{
-	if (isLeafNode())
-	{
-		const std::pair<std::vector<std::vector<float>>, std::vector<float>>& BootstrapDataset = getBootstrapDataset();
-		const std::vector<std::vector<float>>& FeatureSet = BootstrapDataset.first;
-		const std::vector<float>& ResponseSet = BootstrapDataset.second;
-		_ASSERT(FeatureSet.size() == ResponseSet.size() && FeatureSet.size() != 0);
-		int DataNum = FeatureSet.size(), FeatureNum = FeatureSet[0].size();
-		std::ofstream PrintFile;
-		PrintFile.open(vFilePath, std::ios::app);
-
-		if (PrintFile.is_open())
-		{
-			PrintFile << "TrainData" << ",";
-			for (int i = 0; i < FeatureSet[0].size(); i++)
-				PrintFile << "x" << i << ",";
-			PrintFile << "y" << std::endl;
-			for (int i = 0; i < ResponseSet.size(); i++)
-			{
-				PrintFile << i << ",";
-				for (int k = 0; k < FeatureSet[0].size(); k++)
-					PrintFile << FeatureSet[i][k] << ",";
-				PrintFile << ResponseSet[i] << std::endl;
-			}
-
-			std::vector<float> FeatureMean(FeatureSet[0].size(), 0.f);
-			std::vector<float> FeatureVar(FeatureSet[0].size(), 0.f);
-			for (int i = 0; i < FeatureSet[0].size(); i++)
-			{
-				for (int k = 0; k < FeatureSet.size(); k++)
-					FeatureMean[i] += FeatureSet[k][i];
-				FeatureMean[i] /= FeatureSet.size();
-				for (int k = 0; k < FeatureSet.size(); k++)
-					FeatureVar[i] += (FeatureSet[k][i] - FeatureMean[i])*(FeatureSet[k][i] - FeatureMean[i]);
-				FeatureVar[i] = FeatureVar[i] / FeatureSet.size();
-			}
-
-			PrintFile << "mean" << ",";
-			for (int i = 0; i < FeatureMean.size(); i++) PrintFile << FeatureMean[i] << ",";
-			PrintFile << getNodeMeanV() << std::endl;
-			PrintFile << "var" << ",";
-			for (int i = 0; i < FeatureVar.size(); i++) PrintFile << FeatureVar[i] << ",";
-			PrintFile << getNodeVarianceV() << std::endl;
-		}
-	}
-}
-
 //****************************************************************************************************
 //FUNCTION:
 bool CNode::isUnfitted() const
@@ -155,67 +85,6 @@ std::pair<std::vector<float>, std::vector<float>> CNode::calFeatureRange(const s
 		MaxFeature.push_back(max);
 	}
 	return std::make_pair(MinFeature, MaxFeature);
-}
-
-//******************************************************************************
-//FUNCTION:
-std::vector<float> CNode::calOutFeatureRange(const std::vector<float>& vFeatures) const
-{
-	std::vector<float> OutFeatureRange(vFeatures.size());
-	std::pair<std::vector<float>, std::vector<float>> LeafFeatureSet = getFeatureRange();
-	for (auto i = 0; i < LeafFeatureSet.first.size(); i++)
-	{
-		if (vFeatures[i] >= LeafFeatureSet.first[i] && vFeatures[i] <= LeafFeatureSet.second[i])
-			OutFeatureRange[i] = 0.f;
-		else if (vFeatures[i] < LeafFeatureSet.first[i])
-			OutFeatureRange[i] = LeafFeatureSet.first[i] - vFeatures[i];
-		else
-			OutFeatureRange[i] = vFeatures[i] - LeafFeatureSet.second[i];
-	}
-	return OutFeatureRange;
-}
-
-//******************************************************************************
-//FUNCTION:
-std::vector<float> CNode::calOutFeatureSplitRange(const std::vector<float>& vFeatures) const
-{
-	std::vector<float> OutFeatureSplitRange(vFeatures.size());
-	const std::pair<std::vector<float>, std::vector<float>> LeafFeatureSet = getFeatureSplitRange();
-	for (auto i = 0; i < LeafFeatureSet.first.size(); i++)
-	{
-		if (vFeatures[i] >= LeafFeatureSet.first[i] && vFeatures[i] <= LeafFeatureSet.second[i])
-			OutFeatureSplitRange[i] = 0.f;
-		else if (vFeatures[i] < LeafFeatureSet.first[i])
-			OutFeatureSplitRange[i] = LeafFeatureSet.first[i] - vFeatures[i];
-		else
-			OutFeatureSplitRange[i] = vFeatures[i] - LeafFeatureSet.second[i];
-	}
-	return OutFeatureSplitRange;
-}
-
-//****************************************************************************************************
-//FUNCTION:
-float CNode::_calculateVariance(const std::vector<float>& vNumVec)
-{
-	_ASSERTE(!vNumVec.empty());
-		
-	float Mean = std::accumulate(vNumVec.begin(), vNumVec.end(), 0.0f) / vNumVec.size();
-
-	float Variance = 0.0f;
-	for (auto Num : vNumVec) Variance += std::pow(std::abs(Num - Mean), 2.0f);
-
-	return Variance / vNumVec.size();
-}
-
-//****************************************************************************************************
-//FUNCTION:
-float CNode::_calculateMean(const std::vector<float>& vNumVec)
-{
-	_ASSERTE(!vNumVec.empty());
-
-	float Mean = std::accumulate(vNumVec.begin(), vNumVec.end(), 0.0f) / vNumVec.size();
-
-	return Mean;
 }
 
 //****************************************************************************************************

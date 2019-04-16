@@ -15,7 +15,6 @@ namespace hiveRegressionForest
 		float traversePathWithFeatureCentre(const CTree* vTree, const std::vector<float>& vFeature);
 		float traverWithDistanceFromFeaturesCentre(const CTree* vTree, const std::vector<float>& vFeature);
 		float predictWithMonteCarlo(const CNode& vCurLeafNode, const std::vector<float>& vFeature);
-		float predictWithMinMPOnWholeDimension(const CTree* vTree, const std::vector<float>& vFeature);
 		float prediceWithInternalNode(const CTree* vTree, const std::vector<float>& vFeature);
 
 	private:
