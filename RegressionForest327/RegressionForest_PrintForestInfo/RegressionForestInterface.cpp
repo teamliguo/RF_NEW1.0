@@ -30,6 +30,18 @@ unsigned int hiveRegressionForest::hiveBuildRegressionForest(const std::string& 
 	return ForestId;
 }
 
+//****************************************************************************************************
+//FUNCTION:
+unsigned int hiveRegressionForest::hiveRebuildRegressionForest(const std::string & vConfig, const std::string & vFilePath)
+{
+	_ASSERTE(!vConfig.empty());
+
+	CRegressionForest* pRegressionForest = new CRegressionForest();
+	pRegressionForest->rebuildForest(vConfig);
+
+	return hiveLoadForestFromFile(vFilePath);
+}
+
 //******************************************************************************
 //FUNCTION:  for single response
 std::vector<float> hiveRegressionForest::hivePredict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet, unsigned int vForestId)

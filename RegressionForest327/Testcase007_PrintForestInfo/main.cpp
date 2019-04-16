@@ -62,7 +62,8 @@ void main()
 		if (IsModelExist)
 		{
 			_LOG_("ReBuilding Forests...");
-			ForestId = hiveLoadForestFromFile(CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::SERIALIZATION_MODEL_PATH));
+			//ForestId = hiveLoadForestFromFile(CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::SERIALIZATION_MODEL_PATH));
+			ForestId = hiveRebuildRegressionForest("Config.xml", CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::SERIALIZATION_MODEL_PATH));
 			_LOG_("ReBuilding Finished.");
 		}
 		else

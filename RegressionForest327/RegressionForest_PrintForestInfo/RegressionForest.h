@@ -19,6 +19,7 @@ namespace hiveRegressionForest
 		~CRegressionForest();
 
 		void    buildForest(const std::string& vConfigFile);
+		void    rebuildForest(const std::string& vConfigFile);
 		void    predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vNumResponse, std::vector<float>& voPredictValue) const;
 		void	outputForestInfo(const std::string& vOutputFileName) const;
 		void	outputOOBInfo(const std::string& vOutputFileName) const;

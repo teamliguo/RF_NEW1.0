@@ -14,7 +14,7 @@
 #include "BaseInstanceWeightMethod.h"
 #include "RegressionForestConfig.h"
 #include "RegressionForestCommon.h"
-#include "WeightedPathNodeMethod.h"
+#include "PathNodeMethod.h"
 #include "BasePredictionMethod.h"
 #include "MpCompute.h"
 
@@ -71,6 +71,15 @@ void CRegressionForest::buildForest(const std::string& vConfigFile)
 
 	hiveCommon::hiveOutputEvent("Successfully built regression forests in " + std::to_string(End - Begin) + " milliseconds.");
 	_LOG_("Successfully built regression forests in " + std::to_string(End - Begin) + " milliseconds.");
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CRegressionForest::rebuildForest(const std::string & vConfigFile)
+{
+	_ASSERTE(!vConfigFile.empty());
+	bool IsConfigParsed = hiveConfig::hiveParseConfig(vConfigFile, hiveConfig::EConfigType::XML, CRegressionForestConfig::getInstance());
+	_ASSERTE(IsConfigParsed);
 }
 
 //******************************************************************************
@@ -215,7 +224,7 @@ float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFea
 	std::vector<std::vector<SPathNodeInfo>> AllTreePath(vNumOfUsingTrees);
 	std::vector<std::vector<float>> OutLeafFeatureRange(vNumOfUsingTrees);
 	std::vector<std::vector<float>> OutLeafFeatureSplitRange(vNumOfUsingTrees);
-	CWeightedPathNodeMethod* pWeightedPathNode = CWeightedPathNodeMethod::getInstance();
+	CPathNodeMethod* pPathNode = CPathNodeMethod::getInstance();
 	CMpCompute* pMpCompute = nullptr;
 	bool IsPrint =  CTrainingSetConfig::getInstance()->getAttribute<bool>(hiveRegressionForest::KEY_WORDS::IS_PRINT_LEAF_NODE);
 	for (int i = 0; i < vNumOfUsingTrees; ++i)
@@ -237,7 +246,7 @@ float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFea
 			{
 				LeafNodeSet[i] = m_Trees[i]->locateLeafNode(vFeatures);
 				PredictValueOfTree[i] = LeafNodeSet[i]->getNodeMeanV();
-				//voMPPredictSet += pWeightedPathNode->predictWithMinMPOnWholeDimension(m_Trees[i], vFeatures);
+				//voMPPredictSet += pPathNode->predictWithMinMPOnWholeDimension(m_Trees[i], vFeatures);
 				//MPDistanceWeight[i] = pMpCompute->calMPOutOfFeatureAABB(m_Trees[i], LeafNodeSet[i], vFeatures);
 				//MPDistanceWeight[i] = pMpCompute->calMPDissimilarityGlobal(m_Trees[i], LeafNodeSet[i]->getNodeDataIndexV(), vFeatures, PredictValueOfTree[i]);
 				std::vector<std::pair<float, float>> ResponseRange;

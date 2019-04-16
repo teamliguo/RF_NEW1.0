@@ -6,6 +6,7 @@
 namespace hiveRegressionForest
 {
 	REGRESSION_FOREST_EXPORTS unsigned int				hiveBuildRegressionForest(const std::string& vConfig);
+	REGRESSION_FOREST_EXPORTS unsigned int              hiveRebuildRegressionForest(const std::string& vConfig, const std::string& vFilePath);
 	
 	//for single response
 	REGRESSION_FOREST_EXPORTS std::vector<float> 		hivePredict(const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet, unsigned int vForestId);
