@@ -75,7 +75,6 @@ float calR2Score(const std::vector<float>& vTestResponseSet, const std::vector<f
 	return R2Store;
 }
 
-
 //****************************************************************************************************
 //FUNCTION:
 float mean(const std::vector<float>& vData)
@@ -95,7 +94,7 @@ float var(const std::vector<float>& vData)
 	float Mean = mean(vData);
 	for (int i = 0; i < vData.size(); i++)
 	{
-		Sum += (vData[i] - Mean)*(vData[i] - Mean);
+		Sum += pow((vData[i] - Mean), 2);
 	}
 
 	return Sum / vData.size();
@@ -111,7 +110,7 @@ float calSumSquareError(const std::vector<float>& vData)
 	float Mean = mean(vData);
 	for (int i = 0; i < vData.size(); i++)
 	{
-		Sum += (vData[i] - Mean)*(vData[i] - Mean);
+		Sum += pow((vData[i] - Mean), 2);
 	}
 
 	return Sum;

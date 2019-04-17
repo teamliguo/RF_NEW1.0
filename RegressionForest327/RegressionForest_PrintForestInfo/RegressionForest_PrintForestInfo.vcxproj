@@ -143,7 +143,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDLL;REGRESSION_FOREST_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(BOOST);$(HIVE_ROOT)/include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;4267;4018;4819;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4267;4018;4819</DisableSpecificWarnings>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>

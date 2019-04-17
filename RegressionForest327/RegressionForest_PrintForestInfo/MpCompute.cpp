@@ -39,7 +39,6 @@ float CMpCompute::calMPOutOfFeatureAABB(const CTree* vTree, const CNode* vNode, 
 		else
 			MaxMinValue.push_back(std::make_pair(0.f, 0.f));
 	}
-
 	return __calMPValue(vTree, MaxMinValue);
 }
 

@@ -3,7 +3,6 @@
 #include <numeric>
 #include <fstream>
 #include <algorithm>
-#include <map>
 #include "common/CommonInterface.h"
 #include "common/ConfigParser.h"
 #include "common/HiveCommonMicro.h"
@@ -69,7 +68,7 @@ void CRegressionForest::buildForest(const std::string& vConfigFile)
 
 //****************************************************************************************************
 //FUNCTION:
-void CRegressionForest::rebuildForest(const std::string & vConfigFile)
+void CRegressionForest::reParseConfig(const std::string & vConfigFile)
 {
 	_ASSERTE(!vConfigFile.empty());
 	bool IsConfigParsed = hiveConfig::hiveParseConfig(vConfigFile, hiveConfig::EConfigType::XML, CRegressionForestConfig::getInstance());
@@ -86,10 +85,11 @@ std::vector<float> CRegressionForest::predict(const std::vector<std::vector<floa
 	_ASSERTE(pPredictionMethod);
 	std::vector<CTree*> TreeSet = getTreeSet();
 	std::vector<float> PredictionSet(vTestFeatureSet.size());
-	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
-
 	for (auto i = 0; i < vTestFeatureSet.size(); i++)
+	{
+		std::cout << "Predict " << i << " th Test" << std::endl;
 		PredictionSet[i] = pPredictionMethod->predictCertainResponseV(vTestFeatureSet[i], vTestResponseSet[i], TreeSet);
+	}
 	return PredictionSet;
 }
 
@@ -155,7 +155,7 @@ void CRegressionForest::outputForestInfo(const std::string& vOutputFileName) con
 }
 
 //****************************************************************************************************
-//FUNCTION: for multiResponse
+//FUNCTION: Native predict method for multiResponse
 void CRegressionForest::predict(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vNumResponse, std::vector<float>& voPredictValue) const
 {
 	_ASSERTE(!vFeatures.empty());
@@ -166,7 +166,7 @@ void CRegressionForest::predict(const std::vector<float>& vFeatures, unsigned in
 }
 
 //****************************************************************************************************
-//FUNCTION:
+//FUNCTION: Native predict method
 float CRegressionForest::__predictCertainResponse(const std::vector<float>& vFeatures, unsigned int vNumOfUsingTrees, bool vIsWeightedPrediction, unsigned int vResponseIndex) const
 {
 	_ASSERTE(!vFeatures.empty() && vNumOfUsingTrees > 0);

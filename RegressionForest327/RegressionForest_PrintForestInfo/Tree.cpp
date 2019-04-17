@@ -6,7 +6,6 @@
 #include <boost/format.hpp>
 #include <algorithm>
 #include <fstream>
-#include <unordered_map>
 #include "common/HiveCommonMicro.h"
 #include "common/ProductFactoryData.h"
 #include "math/RandomInterface.h"
@@ -98,7 +97,6 @@ void CTree::buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* 
 			}
 		}
 	}
-
 	__obtainOOBIndex(BootstrapIndex);
 }
 
@@ -321,7 +319,6 @@ const CNode* CTree::locateLeafNode(const std::vector<float>& vFeatures) const //
 		{	
 			return pCurrNode;
 		}
-
 		NodeStack.pop();
 		if (vFeatures[pCurrNode->getBestSplitFeatureIndex()] < pCurrNode->getBestGap())
 			NodeStack.push(&pCurrNode->getLeftChild());

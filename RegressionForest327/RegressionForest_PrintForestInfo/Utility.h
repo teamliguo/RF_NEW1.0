@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include "RegressionForest_EXPORTS.h"
 
 REGRESSION_FOREST_EXPORTS void	calAccuracyByThreshold(const std::vector<float>& vData, const std::vector<float>& vThresholdVec, std::vector<float>& voAccuracyVec);

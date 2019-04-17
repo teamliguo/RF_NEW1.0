@@ -31,6 +31,30 @@ void installMemoryLeakDetector()
 #endif
 }
 
+void devideTestToFile(std::vector<std::pair<int, float>>& vioBiasRateIndex, const std::vector<std::vector<float>>& vTestFeatureSet, const std::vector<float>& vTestResponseSet)
+{
+	sort(vioBiasRateIndex.begin(),vioBiasRateIndex.end(), [](std::pair<int, float>& vFirst, std::pair<int, float>& vSecond) {return vFirst.second < vSecond.second; });
+	std::ofstream GoodTestFile(CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::GOOD_TEST_FILE));
+	std::ofstream BadTestFile(CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BAD_TEST_FILE));
+	int PrintDataSize = CTrainingSetConfig::getInstance()->getAttribute<int>(hiveRegressionForest::KEY_WORDS::NEW_FILE_DATA_SIZE);
+	_ASSERTE(PrintDataSize <= vioBiasRateIndex.size());
+
+	for (int i = 2000; i < 2000 + PrintDataSize; i++)
+	{
+		int FrontIndex = vioBiasRateIndex[i].first;
+		int LastIndex = vioBiasRateIndex[vioBiasRateIndex.size() - 1 - i].first;
+		for (int k = 0; k < vTestFeatureSet[0].size(); k++)
+		{
+			GoodTestFile << vTestFeatureSet[FrontIndex][k] << ",";
+			BadTestFile << vTestFeatureSet[LastIndex][k] << ",";
+		}
+		GoodTestFile << vTestResponseSet[FrontIndex] << std::endl;
+		BadTestFile << vTestResponseSet[LastIndex] << std::endl;
+	}
+	GoodTestFile.close();
+	BadTestFile.close();
+}
+
 void main()
 {
 	installMemoryLeakDetector();
@@ -62,7 +86,6 @@ void main()
 		if (IsModelExist)
 		{
 			_LOG_("ReBuilding Forests...");
-			//ForestId = hiveLoadForestFromFile(CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::SERIALIZATION_MODEL_PATH));
 			ForestId = hiveRebuildRegressionForest("Config.xml", CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::SERIALIZATION_MODEL_PATH));
 			_LOG_("ReBuilding Finished.");
 		}
@@ -79,19 +102,16 @@ void main()
 			}
 		}	
 
-		//hiveOutputForestInfo("OutputForestInfo.csv", ForestId);
-		
 		_LOG_("Predict...");
 		std::vector<float> PredictSet(TestFeatureSet.size(), 0.0f);
-		std::vector<float> MPPredictSet(TestFeatureSet.size(), 0.0f);
+
 		clock_t PredictStart = clock();
-	
 		PredictSet = hiveRegressionForest::hivePredict(TestFeatureSet, TestResponseSet, ForestId);
 		clock_t PredictEnd = clock();
+
 		_LOG_("Predict Finished in " + std::to_string(PredictEnd - PredictStart) + " milliseconds.");
 
 		_LOG_("Output predict result to file...");
-		int NumResponse = pTrainingSet->getNumOfResponse();
 		std::ofstream PredictResultFile(CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::PREDICT_RESULT_PATH));	
 		for (auto i = 0; i < TestFeatureSet.size(); i++)
 		{			
@@ -103,7 +123,6 @@ void main()
 		std::vector<float> BiasSet(TestFeatureSet.size(), 0.0f);
 		std::vector<float> BiasRateSet(TestFeatureSet.size(), 0.0f);
 		std::vector<std::pair<int, float>> BiasRateIndex;
-
 		for (int i = 0; i < TestFeatureSet.size(); ++i)
 		{
 			BiasSet[i] = std::abs(PredictSet[i] - TestResponseSet[i]);
@@ -113,28 +132,7 @@ void main()
 
 		bool IsDevideTestFile = CTrainingSetConfig::getInstance()->getAttribute<bool>(hiveRegressionForest::KEY_WORDS::IS_DIVIDE_FILE);
 		if (IsDevideTestFile)
-		{
-			sort(BiasRateIndex.begin(), BiasRateIndex.end(), [](std::pair<int, float>& vFirst, std::pair<int, float>& vSecond) {return vFirst.second < vSecond.second; });
-			std::ofstream GoodTestFile(CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::GOOD_TEST_FILE));
-			std::ofstream BadTestFile(CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::BAD_TEST_FILE));
-			int PrintDataSize = CTrainingSetConfig::getInstance()->getAttribute<int>(hiveRegressionForest::KEY_WORDS::NEW_FILE_DATA_SIZE);
-			_ASSERTE(PrintDataSize <= BiasRateIndex.size());
-
-			for (int i = 2000; i < 2000 + PrintDataSize; i++)
-			{
-				int FrontIndex = BiasRateIndex[i].first;
-				int LastIndex = BiasRateIndex[BiasRateIndex.size() - 1 - i].first;
-				for (int k = 0; k < TestFeatureSet[0].size(); k++)
-				{
-					GoodTestFile << TestFeatureSet[FrontIndex][k] << ",";
-					BadTestFile << TestFeatureSet[LastIndex][k] << ",";
-				}
-				GoodTestFile << TestResponseSet[FrontIndex] << std::endl;
-				BadTestFile << TestResponseSet[LastIndex] << std::endl;
-			}
-			GoodTestFile.close();
-			BadTestFile.close();
-		}
+			devideTestToFile(BiasRateIndex, TestFeatureSet, TestResponseSet);
 
 		float MaxBias = *std::max_element(BiasSet.begin(), BiasSet.end());
 		float SumBias = std::accumulate(BiasSet.begin(), BiasSet.end(), 0.0f);
@@ -172,7 +170,6 @@ void main()
 			StatisticalResultFile << "Accuracy of bias rate < " << BiasRateVec[i] << " : " << AccuracyVecByBiasRate[i] << std::endl;
 		}
 		StatisticalResultFile.close();
-
 	}
 	catch (const std::exception&)
 	{

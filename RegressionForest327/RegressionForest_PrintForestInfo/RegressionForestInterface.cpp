@@ -37,7 +37,7 @@ unsigned int hiveRegressionForest::hiveRebuildRegressionForest(const std::string
 	_ASSERTE(!vConfig.empty());
 
 	CRegressionForest* pRegressionForest = new CRegressionForest();
-	pRegressionForest->rebuildForest(vConfig);
+	pRegressionForest->reParseConfig(vConfig);
 
 	return hiveLoadForestFromFile(vFilePath);
 }
@@ -114,7 +114,7 @@ void hiveRegressionForest::hiveOutputForestInfo(const std::string& vOutputFileNa
 
 //****************************************************************************************************
 //FUNCTION:
-REGRESSION_FOREST_EXPORTS void hiveRegressionForest::hiveOutputForestAndOOBInfo(const std::string& vOutputFileName, unsigned int vForestId)
+void hiveRegressionForest::hiveOutputForestAndOOBInfo(const std::string& vOutputFileName, unsigned int vForestId)
 {
 	const CRegressionForest* pRegressionForest = CRegressionForestPool::getInstance()->fetchForest(vForestId);
 	pRegressionForest->outputOOBInfo(vOutputFileName);

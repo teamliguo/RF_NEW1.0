@@ -18,20 +18,10 @@ namespace hiveRegressionForest
 		int m_NumOfNodes{ 0 };
 		int m_NumOfUnfittedLeafNodes{ 0 };
 		int m_NumOfLeafNodes{ 0 };
-		
 		std::vector<int> m_FeatureSplitTimes;
 		std::vector<int> m_InstanceOOBTimes;
 	};
 
-	struct SPathNodeInfo
-	{
-		int m_TreeID{ 0 };
-		int m_NodeLevel{ 0 };
-		int m_SplitFeature{ 0 };
-		float m_SplitLocation{ 0.f };
-		std::pair<std::vector<float>, std::vector<float>> m_FeatureRange;
-		std::pair<std::vector<float>, std::vector<float>> m_FeatureSplitRange;
-	};
 	class REGRESSION_FOREST_EXPORTS CTree : public hiveOO::CBaseProduct
 	{
 	public:
@@ -47,7 +37,8 @@ namespace hiveRegressionForest
 		const std::vector<int>& getOOBIndexSet() const { _ASSERTE(!m_OOBIndexSet.empty()); return m_OOBIndexSet; }
 		const std::vector<int>&	getBootstrapIndex() const { return m_BootstrapIndex; }
 		const std::vector<std::vector<std::pair<float, float>>>& getSortedFeatureResponsePairSet() const { return m_SortedFeatureResponsePairSet; }
-		bool operator==(const CTree& vTree) const;
+
+		bool                    operator==(const CTree& vTree) const;
 	protected:
 		virtual void _selectCandidateFeaturesV(IFeatureSelector* vFeatureSelector, IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsUpdatingFeaturesWeight, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<int>& voCandidateFeaturesIndex);
 		

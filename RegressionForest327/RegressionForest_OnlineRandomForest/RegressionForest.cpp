@@ -276,8 +276,7 @@ float CRegressionForest::__predictByVarWeightTree(const std::vector<float>& vFea
 	std::vector<std::vector<float>> treeFeatsVarChangedRatio(vNumOfUsingTrees);//记录投入特征之后叶子的方差变化率-变化率大，相似度低
 	std::ofstream VarInfo;
 	VarInfo.open("VarInfo.csv", std::ios::app);
-	/*std::ofstream LeafNodeDisInfo;
-	LeafNodeDisInfo.open("LeafNodeDisInfo.csv", std::ios::app);*/
+	
 	for (int i = 0; i < vNumOfUsingTrees; ++i)
 	{
 		
@@ -297,7 +296,6 @@ float CRegressionForest::__predictByVarWeightTree(const std::vector<float>& vFea
 			{
 				NodeDataFeature[k] = pTrainingSet->getFeatureInstanceAt(nodeDataIndex[k]);
 				NodeDataResponse[k] = pTrainingSet->getResponseValueAt(nodeDataIndex[k]);
-				//LeafNodeDisInfo << i << "," << nodeDataIndex[k] << "," << NodeDataResponse[k] << std::endl;
 			} 
 			 
 			PredictVarWeightTree[i] = pTrainingSet->calLeafWeightForTreeByLp(NodeDataFeature, vFeatures);
@@ -320,21 +318,16 @@ float CRegressionForest::__predictByVarWeightTree(const std::vector<float>& vFea
 	for (int k = 0; k < PredictVarWeightTree.size(); ++k)
 	{
 	distanceOfTree[k] = PredictVarWeightTree[k];
-
 	}
 	//相似度计算：方法1-计算LP距离，方法2-计算投入测试点后的方差变化率
-	std::vector<float> wiDisOfTree = pTrainingSet->antiDistanceWeight(distanceOfTree, -1); 
 	std::vector<float> wiVarOfTree = pTrainingSet->antiVarWeight(treeNodeVar, -1);
 	std::vector<std::vector<float>>  wiFeatsOfTree = pTrainingSet->antiFeatsWeight(treeNodeFeatureVar, -1);
 	std::vector<std::vector<float>>  wiFeatChangedRatioOfTree = pTrainingSet->antiFeatsWeight(treeFeatsVarChangedRatio, -1);
 	std::vector<float> combWiOfTree(vNumOfUsingTrees);
 
-	// combWiOfTree = __calWeightOfTree(vNumOfUsingTrees, wiFeatChangedRatioOfTree );// 测试点引起特征方差变换率计算权重
-	//  combWiOfTree = __calWeightOfTree(vNumOfUsingTrees, wiVarOfTree, wiFeatChangedRatioOfTree,2);//Y方差、测试点引起特征方差变换率计算权重
+	
 	combWiOfTree=__calWeightOfTree(vNumOfUsingTrees, wiFeatsOfTree, wiVarOfTree, wiFeatChangedRatioOfTree,3);//特征方差、Y方差、测试点引起特征方差变换率计算权重
-	//combWiOfTree = __calWeightOfTree(vNumOfUsingTrees, wiFeatsOfTree, wiVarOfTree, wiDisOfTree, 3);//特征方差、Y方差、测试点到叶子中心点距离计算权重
-	//combWiOfTree = __calWeightOfTree(vNumOfUsingTrees, wiFeatsOfTree, wiVarOfTree,2);//特征方差、Y方差计算权重，比例5：5
-	// combWiOfTree = __calWeightOfTree(vNumOfUsingTrees, wiFeatsOfTree, wiVarOfTree);//特征方差、Y方差计算权重，所有特征和y方差比例1：1：1
+
 	_ASSERTE(PredictValueOfTree.size() == NodeWeight.size());
 	for (int k = 0; k < PredictVarWeightTree.size(); ++k)
 	{

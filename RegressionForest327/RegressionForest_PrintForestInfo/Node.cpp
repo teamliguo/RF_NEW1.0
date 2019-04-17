@@ -89,6 +89,5 @@ std::pair<std::vector<float>, std::vector<float>> CNode::calFeatureRange(const s
 float CNode::calculateNodeWeight(unsigned int vResponseIndex /*= 0*/) const
 {
 	float Delta = 1.0f;
-
 	return (1.0f / (getNodeVarianceV(vResponseIndex) + Delta));
 }

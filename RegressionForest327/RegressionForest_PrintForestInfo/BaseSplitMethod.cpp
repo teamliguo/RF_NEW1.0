@@ -50,6 +50,7 @@ void INodeSpliter::_generateSortedFeatureResponsePairSetV(std::vector<int>& vBoo
 	std::sort(voSortedFeatureResponseSet.begin(), voSortedFeatureResponseSet.end(), [](const std::pair<float, float>& P1, const std::pair<float, float>& P2) {return P1.first < P2.first; });
 }
 
+
 //****************************************************************************************************
 //FUNCTION:
 void INodeSpliter::__findBestSplitHyperplane(std::vector<int>& vBootstrapIndex, const std::pair<int, int>& vBootstrapRange, const std::vector<int>& vFeatureIndexSubset, SSplitHyperplane& voSplitHyperplane)
@@ -89,8 +90,8 @@ int INodeSpliter::__processBootstrapRange(std::vector<int>& vBootstrapIndex, con
 	bool IsCurLInLeftSpace = false, IsCurRInLeftSpace = false;
 	while (L <= R)
 	{		
-		IsCurLInLeftSpace = vSplitHyperplane.IsInstanceInLeftSpace(CTrainingSet::getInstance()->getFeatureInstanceAt(vBootstrapIndex[L]));
-		IsCurRInLeftSpace = vSplitHyperplane.IsInstanceInLeftSpace(CTrainingSet::getInstance()->getFeatureInstanceAt(vBootstrapIndex[R]));
+		IsCurLInLeftSpace = vSplitHyperplane.IsInstanceInLeftSpace(pTrainingSet->getFeatureInstanceAt(vBootstrapIndex[L]));
+		IsCurRInLeftSpace = vSplitHyperplane.IsInstanceInLeftSpace(pTrainingSet->getFeatureInstanceAt(vBootstrapIndex[R]));
 
 		if (IsCurLInLeftSpace)
 		{

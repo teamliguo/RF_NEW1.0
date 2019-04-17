@@ -20,8 +20,8 @@ namespace hiveRegressionForest
 		void recombineBootstrapDataset(const std::vector<int>& vBootstrapIndexSet, const std::pair<int, int>& vBootstrapIndexRange, std::vector<int>& voRangeIndex); 
 		void dumpFeatureValueSetAt(const std::vector<int>& vInstanceIndexSet, unsigned int vFeatureIndex, std::vector<float>& voValueSet);
 
-		int							getNumOfInstances() const { return m_FeatureSet.size(); }
-		int							getNumOfFeatures() const { return m_FeatureSet[0].size(); }
+		unsigned int							getNumOfInstances() const { return m_FeatureSet.size(); }
+		unsigned int							getNumOfFeatures() const { return m_FeatureSet[0].size(); }
 		int							getNumOfResponse() const { return m_NumResponse; }
 		float						getFeatureValueAt(unsigned int vInstanceIndex, unsigned int vFeatureIndex) const { return m_FeatureSet[vInstanceIndex][vFeatureIndex]; }
 		float						getResponseValueAt(unsigned int vInstanceIndex, unsigned int vResponseIndex = 0) const { return m_pResponseSet[vInstanceIndex * m_NumResponse + vResponseIndex]; }

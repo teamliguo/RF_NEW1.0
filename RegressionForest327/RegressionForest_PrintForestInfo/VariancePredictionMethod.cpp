@@ -41,7 +41,7 @@ float CVariancePredictionMethod::predictCertainResponseV(const std::vector<float
 	std::vector<std::vector<float>> WeightByTreeFeatureVar		= __calTreeWeightByFeatureVar(TreeFeatureVar, -1);//若有N颗树，则有N个向量，
 	std::vector<std::vector<float>> WeightByTreeFeatureVarRatio = __calTreeWeightByFeatureVar(TreeFeatureVarRatio, -1);
 	std::vector<float> FinalWeight = __calFinalWeight(WeightByTreeFeatureVar, WeightByTreeFeatureVarRatio, WeightByTreeResponseVar);
-	
+
 	float SumOfWeightPrediction = 0.f;
 	for (auto i = 0; i < FinalWeight.size(); i++)
 		SumOfWeightPrediction += FinalWeight[i] * PredictValueOfTree[i];
@@ -55,13 +55,12 @@ void CVariancePredictionMethod::__calVarChangedRatio(const std::vector<std::vect
 	_ASSERTE(!vData.empty() && !vAddValue.empty());
 
 	int DataNum = vData.size(), FeatureNum = vData[0].size();
-	std::vector<float> FeatureSum(FeatureNum, 0.f), FeatureWithNewDataSum(FeatureNum, 0.f);
+	std::vector<float> FeatureSum(FeatureNum, 0.f), FeatureWithNewDataSum(FeatureNum, 0.f);//初始化，改i，k
 	voNativeVar.resize(FeatureNum, 0.f);
 	voChangedRatio.resize(FeatureNum, 0.f);
-
 	for (auto i = 0; i < FeatureNum; i++)
 	{
-		for (auto j = 0; j < DataNum; j++)
+		for (auto j = 0; j <DataNum; j++)
 			FeatureSum[i] += vData[j][i];
 		FeatureWithNewDataSum[i] += FeatureSum[i] + vAddValue[i];
 	}
@@ -73,8 +72,7 @@ void CVariancePredictionMethod::__calVarChangedRatio(const std::vector<std::vect
 			voChangedRatio[k] += pow(vData[j][k] - FeatureWithNewDataSum[k] / (DataNum + 1), 2);
 		}
 		voChangedRatio[k] += pow(vAddValue[k] - FeatureWithNewDataSum[k] / (DataNum + 1), 2);
-		voNativeVar[k] /= DataNum;
-		voChangedRatio[k] = abs(voChangedRatio[k] / (DataNum + 1) - voNativeVar[k]);
+		voChangedRatio[k] = abs(voChangedRatio[k] / (DataNum + 1) - voNativeVar[k] / DataNum);
 	}
 }
 

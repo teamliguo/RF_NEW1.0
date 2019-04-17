@@ -1,5 +1,6 @@
 #include "LPPredictionMethod.h"
 #include <numeric>
+#include <float.h>
 #include "RegressionForestCommon.h"
 #include "common/ProductFactory.h"
 
@@ -16,7 +17,6 @@ float CLPPredictionMethod::predictCertainResponseV(const std::vector<float>& vTe
 	std::vector<float> NodeWeight(TreeNumber, 0.0f);
 	std::vector<float> EuclideanDistance(TreeNumber, 0.0f);
 	static std::vector<const CNode*> LeafNodeSet(TreeNumber);
-#pragma omp parallel for
 	for (int i = 0; i < TreeNumber; ++i)
 	{
 		LeafNodeSet[i] = vTreeSet[i]->locateLeafNode(vTestFeatureInstance);
@@ -41,9 +41,9 @@ float CLPPredictionMethod::__calEuclideanDistance(const std::pair<std::vector<fl
 	for (int i = 0; i < vTestFeatureInstance.size(); ++i)
 	{
 		if (vTestFeatureInstance[i] < vFeatureRange.first[i])
-			EuclideanDistance += (vFeatureRange.first[i] - vTestFeatureInstance[i])*(vFeatureRange.first[i] - vTestFeatureInstance[i]);
-		else if (vTestFeatureInstance[i] > vFeatureRange.second[i])
-			EuclideanDistance += (vTestFeatureInstance[i] - vFeatureRange.second[i])*(vTestFeatureInstance[i] - vFeatureRange.second[i]);
+			EuclideanDistance += pow((vFeatureRange.first[i] - vTestFeatureInstance[i]), 2);
+		if (vTestFeatureInstance[i] > vFeatureRange.second[i])
+			EuclideanDistance += pow((vTestFeatureInstance[i] - vFeatureRange.second[i]), 2);
 	}
 	return sqrt(EuclideanDistance);
 }
