@@ -70,5 +70,6 @@ namespace hiveRegressionForest
 		const std::string LP_PREDICTION_METHOD              = "LP_PREDICTION_METHOD";
 		const std::string VARIANCE_PREDICTION_METHOD        = "VARIANCE_PREDICTION_METHOD";
 
+		const std::string OUT_DIMENSION						= "OUT_DIMENSION";
 	}
 }

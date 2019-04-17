@@ -12,10 +12,10 @@ namespace hiveRegressionForest
 		CSingleResponseNode(unsigned int vLevel) { m_Level = vLevel; }
 		~CSingleResponseNode();
 
-		virtual void createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) override;
-		virtual void createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, const std::vector<int>& vDataSetIndex, const std::pair<int, int>& vIndexRange) override;
-		virtual void outputLeafNodeInfoV(const std::string& vFilePath) const override;
-		virtual void calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) override;
+		virtual void  createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) override;
+		virtual void  createAsLeafNodeV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, const std::vector<int>& vDataSetIndex, const std::pair<int, int>& vIndexRange) override;
+		virtual void  outputLeafNodeInfoV(const std::string& vFilePath) const override;
+		virtual void  calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset) override;
 		virtual float predictV(const std::vector<float>& vFeatureInstance, unsigned int vResponseIndex) const override;
 		virtual float getNodeMeanV(unsigned int vResponseIndex = 0) const override;
 		virtual float getNodeVarianceV(unsigned int vResponseIndex = 0) const override;

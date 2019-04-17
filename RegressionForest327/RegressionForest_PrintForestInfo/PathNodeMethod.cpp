@@ -2,28 +2,26 @@
 #include <vector>
 #include <stack>
 #include <fstream>
-#include "RegressionForestConfig.h"
 #include "RegressionForestCommon.h"
 #include "common/HiveCommonMicro.h"
-#include "MpCompute.h"
 
 using namespace hiveRegressionForest;
-
-#define EPSILON 1.0e-6
 
 //****************************************************************************************************
 //FUNCTION:
 float CPathNodeMethod::calOutNodeBound(const std::vector<float>& vFeature, const std::pair<std::vector<float>, std::vector<float>>& vFeatureRange)
 {
-	_ASSERTE(vFeature.size() == vFeatureRange.first.size());
-	std::vector<float> Lower = vFeatureRange.first;
-	std::vector<float> Upper = vFeatureRange.second;
+	_ASSERTE(!vFeature.empty() && !vFeatureRange.first.empty());
+
+	const std::vector<float>& Lower = vFeatureRange.first;
+	const std::vector<float>& Upper = vFeatureRange.second;
 	float sumOutRange = 0;
 	for (int i = 0; i < Lower.size(); i++)
 	{
 		sumOutRange += (vFeature[i] >= Lower[i]) ? 0 : Lower[i] - vFeature[i];
 		sumOutRange += (vFeature[i] <= Upper[i]) ? 0 : vFeature[i] - Upper[i];
 	}
+
 	return sumOutRange;
 }
 
@@ -31,15 +29,17 @@ float CPathNodeMethod::calOutNodeBound(const std::vector<float>& vFeature, const
 //FUNCTION:
 float CPathNodeMethod::calEuclideanDistanceFromNodeBound(const std::vector<float>& vFeature, const std::pair<std::vector<float>, std::vector<float>>& vFeatureRange)
 {
-	_ASSERTE(vFeature.size() == vFeatureRange.first.size());
-	std::vector<float> Lower = vFeatureRange.first;
-	std::vector<float> Upper = vFeatureRange.second;
+	_ASSERTE(!vFeature.empty() && !vFeatureRange.first.empty());
+
+	const std::vector<float>& Lower = vFeatureRange.first;
+	const std::vector<float>& Upper = vFeatureRange.second;
 	float EuclideanDistance = 0.f;
 	for (int i = 0; i < Lower.size(); i++)
 	{
 		EuclideanDistance += (vFeature[i] >= Lower[i]) ? 0 : (Lower[i] - vFeature[i])*(Lower[i] - vFeature[i]);
 		EuclideanDistance += (vFeature[i] <= Upper[i]) ? 0 : (vFeature[i] - Upper[i])*(vFeature[i] - Upper[i]);
 	}
+
 	return sqrt(EuclideanDistance);
 }
 
@@ -47,7 +47,8 @@ float CPathNodeMethod::calEuclideanDistanceFromNodeBound(const std::vector<float
 //FUNCTION:
 float CPathNodeMethod::traversalPathPrediction(const CTree* vTree, const std::vector<float>& vFeature)
 {
-	_ASSERTE(vTree);
+	_ASSERTE(!vFeature.empty());
+
 	std::stack<const CNode*> NodeStack;
 	const CNode* TreeRoot = &vTree->getRoot();
 	NodeStack.push(TreeRoot);
@@ -56,20 +57,19 @@ float CPathNodeMethod::traversalPathPrediction(const CTree* vTree, const std::ve
 	{
 		const CNode* pCurrentNode = NodeStack.top();
 		int SplitFeature = pCurrentNode->getBestSplitFeatureIndex();
-		std::pair<std::vector<float>, std::vector<float>> FeatureRange = pCurrentNode->getFeatureRange();
+		const std::pair<std::vector<float>, std::vector<float>>& FeatureRange = pCurrentNode->getFeatureRange();
 
-		//针对测试点距每个结点划分维度的远近计算weight
-		if (FeatureRange.first[SplitFeature] - vFeature[SplitFeature] > EPSILON)
+		if (FeatureRange.first[SplitFeature] - vFeature[SplitFeature] > FLT_EPSILON)
 		{
-			float Len = (FeatureRange.second[SplitFeature] - FeatureRange.first[SplitFeature] + EPSILON) / (FeatureRange.first[SplitFeature] - vFeature[SplitFeature]);
+			float Len = (FeatureRange.second[SplitFeature] - FeatureRange.first[SplitFeature] + FLT_EPSILON) / (FeatureRange.first[SplitFeature] - vFeature[SplitFeature]);
 			WeightSum += Len * pCurrentNode->getLevel();
 			PredictResult += (pCurrentNode->getNodeMeanV()) * (Len*(pCurrentNode->getLevel()));
 			if (pCurrentNode->isLeafNode())
 				return PredictResult / WeightSum;
 		}
-		if (vFeature[SplitFeature] - FeatureRange.second[SplitFeature] > EPSILON)
+		if (vFeature[SplitFeature] - FeatureRange.second[SplitFeature] > FLT_EPSILON)
 		{
-			float Len = (FeatureRange.second[SplitFeature] - FeatureRange.first[SplitFeature] + EPSILON) / (vFeature[SplitFeature] - FeatureRange.second[SplitFeature]);
+			float Len = (FeatureRange.second[SplitFeature] - FeatureRange.first[SplitFeature] + FLT_EPSILON) / (vFeature[SplitFeature] - FeatureRange.second[SplitFeature]);
 			WeightSum += Len * pCurrentNode->getLevel();
 			PredictResult += (pCurrentNode->getNodeMeanV()) * (Len*(pCurrentNode->getLevel()));
 			if (pCurrentNode->isLeafNode())
@@ -84,13 +84,16 @@ float CPathNodeMethod::traversalPathPrediction(const CTree* vTree, const std::ve
 		else
 			NodeStack.push(&pCurrentNode->getRightChild());
 	}
+
+	return PredictResult;
 }
 
 //****************************************************************************************************
 //FUNCTION:
 float CPathNodeMethod::traverWithDistanceFromFeatureRange(const CTree* vTree, const std::vector<float>& vFeature)
 {
-	_ASSERTE(vTree);
+	_ASSERTE(!vFeature.empty());
+
 	std::stack<const CNode*> NodeStack;
 	const CNode* TreeRoot = &vTree->getRoot();
 	NodeStack.push(TreeRoot);
@@ -104,13 +107,13 @@ float CPathNodeMethod::traverWithDistanceFromFeatureRange(const CTree* vTree, co
 		float DistanceFromFeatureRange = 1.0f;
 		for (int i = 0; i < vFeature.size(); i++)
 		{
-			if (FeatureRange.first[i] - vFeature[i] > EPSILON)
+			if (FeatureRange.first[i] - vFeature[i] > FLT_EPSILON)
 			{
-				DistanceFromFeatureRange *= (FeatureRange.second[i] - FeatureRange.first[i] + EPSILON) / (FeatureRange.first[i] - vFeature[i]);
+				DistanceFromFeatureRange *= (FeatureRange.second[i] - FeatureRange.first[i] + FLT_EPSILON) / (FeatureRange.first[i] - vFeature[i]);
 			}
-			if (vFeature[i] - FeatureRange.second[i] > EPSILON)
+			if (vFeature[i] - FeatureRange.second[i] > FLT_EPSILON)
 			{
-				DistanceFromFeatureRange *= (FeatureRange.second[i] - FeatureRange.first[i] + EPSILON) / (vFeature[i] - FeatureRange.second[i]);
+				DistanceFromFeatureRange *= (FeatureRange.second[i] - FeatureRange.first[i] + FLT_EPSILON) / (vFeature[i] - FeatureRange.second[i]);
 			}
 		}
 
@@ -118,7 +121,6 @@ float CPathNodeMethod::traverWithDistanceFromFeatureRange(const CTree* vTree, co
 		{
 			WeightSum += DistanceFromFeatureRange;
 			PredictResult += DistanceFromFeatureRange*pCurrentNode->getNodeMeanV();
-			std::cout << "level: " << pCurrentNode->getLevel() << "  NodeMean: " << pCurrentNode->getNodeMeanV() << "  weight: " << DistanceFromFeatureRange << " prediction: " << DistanceFromFeatureRange*pCurrentNode->getNodeMeanV() << std::endl;
 		}
 
 		if (pCurrentNode->isLeafNode())
@@ -132,13 +134,16 @@ float CPathNodeMethod::traverWithDistanceFromFeatureRange(const CTree* vTree, co
 		else
 			NodeStack.push(&pCurrentNode->getRightChild());
 	}
+
+	return PredictResult;
 }
 
 //****************************************************************************************************
 //FUNCTION:
 float CPathNodeMethod::traversePathWithFeatureCentre(const CTree* vTree, const std::vector<float>& vFeature)
 {
-	_ASSERTE(vTree);
+	_ASSERTE(!vFeature.empty());
+
 	std::stack<const CNode*> NodeStack;
 	const CNode* TreeRoot = &vTree->getRoot();
 	NodeStack.push(TreeRoot);
@@ -160,7 +165,6 @@ float CPathNodeMethod::traversePathWithFeatureCentre(const CTree* vTree, const s
 		{
 			WeightSum += 1 / DistanceFromFeatures;
 			PredictResult += 1 / DistanceFromFeatures*pCurrentNode->getNodeMeanV();
-			//std::cout << "level: " << pCurrentNode->getLevel() << "  NodeMean: " << pCurrentNode->getNodeMeanV() << "  weight: " << 1 / DistanceFromFeatures << std::endl;
 		}
 
 		if (pCurrentNode->isLeafNode())
@@ -174,6 +178,8 @@ float CPathNodeMethod::traversePathWithFeatureCentre(const CTree* vTree, const s
 		else
 			NodeStack.push(&pCurrentNode->getRightChild());
 	}
+
+	return PredictResult;
 }
 
 
@@ -181,7 +187,8 @@ float CPathNodeMethod::traversePathWithFeatureCentre(const CTree* vTree, const s
 //FUNCTION:
 float CPathNodeMethod::traverWithDistanceFromFeaturesCentre(const CTree* vTree, const std::vector<float>& vFeature)
 {
-	_ASSERTE(vTree);
+	_ASSERTE(!vFeature.empty());
+
 	std::stack<const CNode*> NodeStack;
 	const CNode* TreeRoot = &vTree->getRoot();
 	NodeStack.push(TreeRoot);
@@ -203,12 +210,11 @@ float CPathNodeMethod::traverWithDistanceFromFeaturesCentre(const CTree* vTree, 
 			else
 				DistanceFromFeatures *= (FeatureRange.second[i] - FeatureRange.first[i]) / (std::abs(vFeature[i] - FeatureRange.second[i]) + std::abs(vFeature[i] - FeatureRange.first[i]));
 		}
-		//DistanceFromFeatures = DistanceFromFeatures - 1.0;
+
 		if (DistanceFromFeatures != 1.0f)
 		{
 			WeightSum += DistanceFromFeatures;
 			PredictResult += DistanceFromFeatures*pCurrentNode->getNodeMeanV();
-			//std::cout << "level: " << pCurrentNode->getLevel() << "  NodeMean: " << pCurrentNode->getNodeMeanV() << "  weight: " << DistanceFromFeatures << " prediction: " << DistanceFromFeatures*pCurrentNode->getNodeMeanV() << std::endl;
 		}
 
 		if (pCurrentNode->isLeafNode())
@@ -222,12 +228,16 @@ float CPathNodeMethod::traverWithDistanceFromFeaturesCentre(const CTree* vTree, 
 		else
 			NodeStack.push(&pCurrentNode->getRightChild());
 	}
+
+	return PredictResult;
 }
 
 //****************************************************************************************************
 //FUNCTION:
 float CPathNodeMethod::predictWithMonteCarlo(const CNode& vCurLeafNode, const std::vector<float>& vFeature)
 {
+	_ASSERTE(!vFeature.empty());
+
 	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
 	std::vector<int> DataIndex = (const_cast<CNode*>(&vCurLeafNode))->getNodeDataIndex();
 	sort(DataIndex.begin(), DataIndex.end());
@@ -267,6 +277,8 @@ float CPathNodeMethod::__computeCDF(float vFirst, float vSecond)
 //FUNCTION:
 float CPathNodeMethod::__calInternalNodeMeanValue(const std::vector<int>& vDataSetIndexSet)
 {
+	_ASSERTE(!vDataSetIndexSet.empty());
+
 	CTrainingSet* pTrainingSet = CTrainingSet::getInstance();
 	int DataSize = vDataSetIndexSet.size();
 	float MeanValue = 0.f;
@@ -274,6 +286,7 @@ float CPathNodeMethod::__calInternalNodeMeanValue(const std::vector<int>& vDataS
 	{
 		MeanValue += pTrainingSet->getResponseValueAt(vDataSetIndexSet[i]);
 	}
+
 	return MeanValue / DataSize;
 }
 
@@ -281,11 +294,14 @@ float CPathNodeMethod::__calInternalNodeMeanValue(const std::vector<int>& vDataS
 //FUNCTION:
 bool CPathNodeMethod::__isTotalInBoundBox(const std::vector<float>& vTestPoint, const std::vector<float>& vLow, const std::vector<float>& vHeigh)
 {
+	_ASSERTE(!vTestPoint.empty() && !vLow.empty() && !vHeigh.empty());
+
 	for (int i = 0; i < vTestPoint.size(); ++i)
 	{
 		if (vTestPoint[i] < vLow[i] || vTestPoint[i] > vHeigh[i])
 			return false;
 	}
+
 	return true;
 }
 
@@ -293,6 +309,8 @@ bool CPathNodeMethod::__isTotalInBoundBox(const std::vector<float>& vTestPoint, 
 //FUNCTION:
 bool CPathNodeMethod::__isOneMoreOutBoundRange(const std::vector<float>& vTestPoint, const std::vector<float>& vLow, const std::vector<float>& vHeigh, int vOutDimension)
 {
+	_ASSERTE(!vTestPoint.empty() && !vLow.empty() && !vHeigh.empty());
+
 	int count = 0;
 	for (int i = 0; i < vTestPoint.size(); ++i)
 	{
@@ -301,6 +319,7 @@ bool CPathNodeMethod::__isOneMoreOutBoundRange(const std::vector<float>& vTestPo
 		if (count >= vOutDimension)
 			return false;
 	}
+
 	return true;
 }
 
@@ -315,6 +334,7 @@ std::vector<int> CPathNodeMethod::__calInternalNodeDataIndex(const CNode* vNode)
 	std::vector<int> LeftDataIndex = __calInternalNodeDataIndex(LeftNode);
 	std::vector<int> RightNodeDataIndex = __calInternalNodeDataIndex(RightNode);
 	LeftDataIndex.insert(LeftDataIndex.end(), RightNodeDataIndex.begin(), RightNodeDataIndex.end());
+
 	return LeftDataIndex;
 }
 
@@ -322,11 +342,12 @@ std::vector<int> CPathNodeMethod::__calInternalNodeDataIndex(const CNode* vNode)
 //FUNCTION:
 float CPathNodeMethod::prediceWithInternalNode(const CTree* vTree, const std::vector<float>& vFeature)
 {
-	_ASSERTE(vTree);
+	_ASSERTE(!vFeature.empty());
+
 	std::stack<const CNode*> NodeStack;
 	const CNode* TreeRoot = &vTree->getRoot();
 	NodeStack.push(TreeRoot);
-	int OutDimension = CTrainingSetConfig::getInstance()->getAttribute<int>(KEY_WORDS::OUT_DIMENSION);
+	int OutDimension = CRegressionForestConfig::getInstance()->getAttribute<int>(KEY_WORDS::OUT_DIMENSION);
 	while (!NodeStack.empty())
 	{
 		const CNode* pCurrentNode = NodeStack.top();
@@ -351,4 +372,6 @@ float CPathNodeMethod::prediceWithInternalNode(const CTree* vTree, const std::ve
 			return pCurrentNode->getNodeMeanV();
 		}
 	}
+
+	return 0.f;
 }

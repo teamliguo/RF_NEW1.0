@@ -3,10 +3,7 @@
 #include "common/OOInterface.h"
 #include "common/HiveCommonMicro.h"
 #include "common/ProductFactoryData.h"
-#include "TrainingSet.h"
 #include "ObjectPool.h"
-#include "RegressionForestConfig.h"
-#include "RegressionForestCommon.h"
 
 using namespace hiveRegressionForest;
 

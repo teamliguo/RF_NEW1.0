@@ -11,8 +11,6 @@
 #include "common/ProductFactoryData.h"
 #include "math/RandomInterface.h"
 #include "TrainingSet.h"
-#include "RegressionForestCommon.h"
-#include "RegressionForestConfig.h"
 #include "BaseInstanceWeightMethod.h"
 #include "BaseFeatureWeightMethod.h"
 #include "ObjectPool.h"
@@ -284,12 +282,27 @@ void CTree::__sortFeatureResponsePairSet()
 	std::vector<std::vector<float>>& FeatureSet = BootstrapDataset.first;
 	std::vector<float>& ResponseSet = BootstrapDataset.second;
 	m_SortedFeatureResponsePairSet.resize(FeatureSet[0].size());
-	CMpCompute* pMpCompute = nullptr;
 	for (int i = 0; i < FeatureSet[0].size(); ++i)
 	{
-		pMpCompute->generateSortedFeatureResponsePairSet(FeatureSet, ResponseSet, i, m_SortedFeatureResponsePairSet[i]);
+		__generateSortedFeatureResponsePairSet(FeatureSet, ResponseSet, i, m_SortedFeatureResponsePairSet[i]);
 	}
-	_SAFE_DELETE(pMpCompute);
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CTree::__generateSortedFeatureResponsePairSet(const std::vector<std::vector<float>>& vFeatureSet, const std::vector<float>& vResponseSet, unsigned int vFeatureIndex, std::vector<std::pair<float, float>>& voSortedFeatureResponseSet)
+{
+	_ASSERTE(!vFeatureSet.empty() && !vResponseSet.empty());
+
+	voSortedFeatureResponseSet.resize(vFeatureSet.size());
+
+	const CTrainingSet *pTrainingSet = CTrainingSet::getInstance();
+	for (int i = 0; i < vFeatureSet.size(); ++i)
+	{
+		voSortedFeatureResponseSet[i] = std::make_pair(vFeatureSet[i][vFeatureIndex], vResponseSet[i]);
+	}
+
+	std::sort(voSortedFeatureResponseSet.begin(), voSortedFeatureResponseSet.end(), [](const std::pair<float, float>& P1, const std::pair<float, float>& P2) {return P1.first < P2.first; });
 }
 
 //****************************************************************************************************

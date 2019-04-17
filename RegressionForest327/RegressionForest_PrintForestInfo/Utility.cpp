@@ -58,6 +58,8 @@ float calMSE(const std::vector<float>& vDeviateData)
 //FUNCTION:
 float calR2Score(const std::vector<float>& vTestResponseSet, const std::vector<float>& vPredictSet)
 {
+	_ASSERTE(!vTestResponseSet.empty() && !vPredictSet.empty());
+
 	float SumY = std::accumulate(std::begin(vTestResponseSet), std::end(vTestResponseSet), 0.0f);
 	float MeanY = SumY / vTestResponseSet.size();
 
@@ -78,8 +80,8 @@ float calR2Score(const std::vector<float>& vTestResponseSet, const std::vector<f
 //FUNCTION:
 float mean(const std::vector<float>& vData)
 {
+	_ASSERTE(!vData.empty());
 	float Sum = std::accumulate(vData.begin(), vData.end(), 0.f);
-
 	return Sum / vData.size();
 }
 
@@ -87,25 +89,31 @@ float mean(const std::vector<float>& vData)
 //FUNCTION:
 float var(const std::vector<float>& vData)
 {
+	_ASSERTE(!vData.empty());
+
 	float Sum = 0.f;
 	float Mean = mean(vData);
 	for (int i = 0; i < vData.size(); i++)
 	{
 		Sum += (vData[i] - Mean)*(vData[i] - Mean);
 	}
-	return Sum/vData.size();
+
+	return Sum / vData.size();
 }
 
 //******************************************************************************
 //FUNCTION:
 float calSumSquareError(const std::vector<float>& vData)
 {
+	_ASSERTE(!vData.empty());
+
 	float Sum = 0.f;
 	float Mean = mean(vData);
 	for (int i = 0; i < vData.size(); i++)
 	{
 		Sum += (vData[i] - Mean)*(vData[i] - Mean);
 	}
+
 	return Sum;
 }
 
@@ -113,7 +121,8 @@ float calSumSquareError(const std::vector<float>& vData)
 //FUNCTION:
 float cov(const std::vector<float>& vDataA, const std::vector<float>& vDataB)
 {
-	_ASSERTE(vDataA.size() == vDataB.size());
+	_ASSERTE(!vDataA.empty() && vDataA.size() == vDataB.size());
+
 	float Sum = 0.0;
 	float MeanA = mean(vDataA);
 	float MeanB = mean(vDataB);
@@ -121,6 +130,7 @@ float cov(const std::vector<float>& vDataA, const std::vector<float>& vDataB)
 	{
 		Sum += (vDataA[i] - MeanA)*(vDataB[i] - MeanB);
 	}
+
 	return Sum;
 }
 
@@ -128,7 +138,7 @@ float cov(const std::vector<float>& vDataA, const std::vector<float>& vDataB)
 //FUNCTION:
 float samplePearsonCorrelationCoefficient(const std::vector<float>& vDataA, const std::vector<float>&vDataB)
 {
-	_ASSERTE(vDataA.size() == vDataB.size());
+	_ASSERTE(!vDataA.empty() && vDataA.size() == vDataB.size());
 	return (cov(vDataA, vDataB)) / (sqrt(calSumSquareError(vDataA)*calSumSquareError(vDataB)));
 }
 
@@ -141,6 +151,4 @@ void transpose(const std::vector<std::vector<float>>& vNativeMatrix, std::vector
 	for (auto i = 0; i < vNativeMatrix[0].size(); i++)
 		for (auto j = 0; j < vNativeMatrix.size(); j++)
 			voTransposeMatrix[i].push_back(vNativeMatrix[j][i]);
-    
 }
-

@@ -88,9 +88,9 @@ float CSingleResponseNode::getNodeMeanV(unsigned int vResponseIndex /*= 0*/) con
 //FUNCTION:
 void CSingleResponseNode::calStatisticsV(const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset)
 {
-	m_NodeVariance = var(vBootstrapDataset.second);
-	m_NodeMean = mean(vBootstrapDataset.second);
-	m_FeatureRange = calFeatureRange(vBootstrapDataset.first);
+	m_NodeVariance	= var(vBootstrapDataset.second);
+	m_NodeMean		= mean(vBootstrapDataset.second);
+	m_FeatureRange	= calFeatureRange(vBootstrapDataset.first);
 }
 
 //******************************************************************************

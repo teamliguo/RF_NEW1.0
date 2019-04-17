@@ -41,4 +41,5 @@ void CRegressionForestConfig::__defineAcceptableAttributes()
 	defineAttribute(KEY_WORDS::BUILD_TREE_TYPE,								hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::CREATE_NODE_TYPE,							hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::PREDICTION_METHOD,                           hiveConfig::ATTRIBUTE_STRING);
+	defineAttribute(KEY_WORDS::OUT_DIMENSION,								hiveConfig::ATTRIBUTE_INT);
 }

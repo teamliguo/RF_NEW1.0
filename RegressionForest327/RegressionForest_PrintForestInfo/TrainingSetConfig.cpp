@@ -27,5 +27,4 @@ void CTrainingSetConfig::__defineAcceptableAttributes()
 	defineAttribute(KEY_WORDS::NEW_FILE_DATA_SIZE,			hiveConfig::ATTRIBUTE_INT);
 	defineAttribute(KEY_WORDS::GOOD_TEST_FILE,				hiveConfig::ATTRIBUTE_STRING);
 	defineAttribute(KEY_WORDS::BAD_TEST_FILE,				hiveConfig::ATTRIBUTE_STRING);
-	defineAttribute(KEY_WORDS::OUT_DIMENSION,				hiveConfig::ATTRIBUTE_INT);
 }

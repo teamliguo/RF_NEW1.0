@@ -26,7 +26,5 @@ namespace hiveRegressionForest
 		const std::string PRINT_TREE_NUMBER			= "PRINT_TREE_NUMBER";
 		const std::string BEST_TREE_PATH			= "BEST_TREE_PATH";
 		const std::string BAD_TREE_PATH				= "BAD_TREE_PATH";
-
-		const std::string OUT_DIMENSION				= "OUT_DIMENSION";
 	}
 }

@@ -46,19 +46,19 @@ namespace hiveRegressionForest
 		float			getBestGap()				const { return m_BestGap; }		
 		unsigned int	getBestSplitFeatureIndex()	const { return m_BestSplitFeatureIndex; }
 
-		const std::pair<std::vector<float>, std::vector<float>>& getFeatureRange() const { return m_FeatureRange; } 
-		const std::vector<int>& getNodeDataIndex()const { return m_DataSetIndex; }
+		const std::pair<std::vector<float>, std::vector<float>>&	getFeatureRange()  const { return m_FeatureRange; } 
+		const std::vector<int>&										getNodeDataIndex() const { return m_DataSetIndex; }
 
 	protected:
-		bool m_IsLeafNode = false;
-		unsigned int m_Level = 0;
-		unsigned int m_BestSplitFeatureIndex = 0;
-		float m_BestGap = FLT_MAX;
-		unsigned int m_NodeSize = 0;
+		bool				m_IsLeafNode = false;
+		unsigned int		m_Level = 0;
+		unsigned int		m_BestSplitFeatureIndex = 0;
+		float				m_BestGap = FLT_MAX;
+		unsigned int		m_NodeSize = 0;
+		std::vector<int>	m_DataSetIndex;
+		CNode*				m_pLeftChild = nullptr;
+		CNode*				m_pRightChild = nullptr;
 		std::pair<std::vector<float>, std::vector<float>> m_FeatureRange;
-		std::vector<int> m_DataSetIndex;
-		CNode* m_pLeftChild = nullptr;
-		CNode* m_pRightChild = nullptr;
 
 	private:
 		template <typename Archive>
@@ -68,7 +68,8 @@ namespace hiveRegressionForest
 			ar & m_Level;
 			ar & m_BestSplitFeatureIndex;
 			ar & m_BestGap;
-			ar & m_NodeSize;			
+			ar & m_NodeSize;
+			ar & m_DataSetIndex;
 			ar & m_pLeftChild;
 			ar & m_pRightChild;
 			ar & m_FeatureRange;

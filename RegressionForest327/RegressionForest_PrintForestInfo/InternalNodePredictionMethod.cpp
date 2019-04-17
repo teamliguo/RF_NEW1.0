@@ -17,7 +17,7 @@ float CInternalNodePredictionMethod::predictCertainResponseV(const std::vector<f
 	std::vector<float> PredictValueOfTree(TreeNumber, 0.0f);
 	CPathNodeMethod* pPathNodeMethod = CPathNodeMethod::getInstance();
 
-//#pragma omp parallel for
+#pragma omp parallel for
 	for (int i = 0; i < TreeNumber; ++i)
 	{
 		PredictValueOfTree[i] = pPathNodeMethod->prediceWithInternalNode(vTreeSet[i], vTestFeatureInstance);

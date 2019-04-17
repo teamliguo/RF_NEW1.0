@@ -16,12 +16,17 @@ float CLPPredictionMethod::predictCertainResponseV(const std::vector<float>& vTe
 	std::vector<float> NodeWeight(TreeNumber, 0.0f);
 	std::vector<float> EuclideanDistance(TreeNumber, 0.0f);
 	static std::vector<const CNode*> LeafNodeSet(TreeNumber);
-	float PredictValue = 0.f;
+#pragma omp parallel for
 	for (int i = 0; i < TreeNumber; ++i)
 	{
 		LeafNodeSet[i] = vTreeSet[i]->locateLeafNode(vTestFeatureInstance);
 		PredictValueOfTree[i] = vTreeSet[i]->predict(*LeafNodeSet[i], vTestFeatureInstance, NodeWeight[i]);
 		EuclideanDistance[i] = 1.0 / (__calEuclideanDistance(LeafNodeSet[i]->getFeatureRange(), vTestFeatureInstance) + 1e-6);
+	}
+
+	float PredictValue = 0.f;
+	for (int i = 0; i < TreeNumber; ++i)
+	{
 		PredictValue += PredictValueOfTree[i] * EuclideanDistance[i];
 	}
 	float WeightSum = std::accumulate(EuclideanDistance.begin(), EuclideanDistance.end(), 0.0f);
@@ -40,5 +45,5 @@ float CLPPredictionMethod::__calEuclideanDistance(const std::pair<std::vector<fl
 		else if (vTestFeatureInstance[i] > vFeatureRange.second[i])
 			EuclideanDistance += (vTestFeatureInstance[i] - vFeatureRange.second[i])*(vTestFeatureInstance[i] - vFeatureRange.second[i]);
 	}
-	return EuclideanDistance;
+	return sqrt(EuclideanDistance);
 }

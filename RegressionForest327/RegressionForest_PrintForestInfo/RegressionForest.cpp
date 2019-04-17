@@ -9,14 +9,8 @@
 #include "common/HiveCommonMicro.h"
 #include "common/ProductFactoryData.h"
 #include "common/productfactory.h"
-#include "Tree.h"
-#include "TrainingSet.h"
-#include "BaseInstanceWeightMethod.h"
-#include "RegressionForestConfig.h"
 #include "RegressionForestCommon.h"
-#include "PathNodeMethod.h"
 #include "BasePredictionMethod.h"
-#include "MpCompute.h"
 
 using namespace hiveRegressionForest;
 

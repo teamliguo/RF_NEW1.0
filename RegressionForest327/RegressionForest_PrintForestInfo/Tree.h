@@ -8,8 +8,6 @@
 #include "BaseSplitMethod.h"
 #include "BaseFeatureWeightMethod.h"
 #include "RegressionForest_EXPORTS.h"
-#include "TrainingSetConfig.h"
-#include "TrainingSetCommon.h"
 
 namespace hiveRegressionForest
 {
@@ -40,17 +38,15 @@ namespace hiveRegressionForest
 		CTree();
 		virtual ~CTree();
 
-		void buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* vFeatureSelector, INodeSpliter* vNodeSpliter, IBaseTerminateCondition* vTerminateCondition, IFeatureWeightGenerator* vFeatureWeightMethod);
-		
-		const CNode* locateLeafNode(const std::vector<float>& vFeatures) const;
-		float predict(const CNode& vCurLeafNode, const std::vector<float>& vFeatures, float& voWeight, unsigned int vResponseIndex = 0) const;
-		
-		void fetchTreeInfo(STreeInfo& voTreeInfo) const;
-		const CNode& getRoot() const { return *m_pRoot; }
+		void					buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* vFeatureSelector, INodeSpliter* vNodeSpliter, IBaseTerminateCondition* vTerminateCondition, IFeatureWeightGenerator* vFeatureWeightMethod);		
+		void					fetchTreeInfo(STreeInfo& voTreeInfo) const;
+		void					setBootstrapIndex(std::vector<int>& vBootstrapIndex) { m_BootstrapIndex = vBootstrapIndex; }
+		float					predict(const CNode& vCurLeafNode, const std::vector<float>& vFeatures, float& voWeight, unsigned int vResponseIndex = 0) const;
+		const CNode*			locateLeafNode(const std::vector<float>& vFeatures) const;
+		const CNode&			getRoot() const { return *m_pRoot; }
 		const std::vector<int>& getOOBIndexSet() const { _ASSERTE(!m_OOBIndexSet.empty()); return m_OOBIndexSet; }
-		void setBootstrapIndex(std::vector<int>& vBootstrapIndex) { m_BootstrapIndex = vBootstrapIndex; }
-		const std::vector<int> getBootstrapIndex() const { return m_BootstrapIndex; }
-		const std::vector<std::vector<std::pair<float, float>>> getSortedFeatureResponsePairSet() const { return m_SortedFeatureResponsePairSet; }
+		const std::vector<int>&	getBootstrapIndex() const { return m_BootstrapIndex; }
+		const std::vector<std::vector<std::pair<float, float>>>& getSortedFeatureResponsePairSet() const { return m_SortedFeatureResponsePairSet; }
 		bool operator==(const CTree& vTree) const;
 	protected:
 		virtual void _selectCandidateFeaturesV(IFeatureSelector* vFeatureSelector, IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsUpdatingFeaturesWeight, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<int>& voCandidateFeaturesIndex);
@@ -65,6 +61,7 @@ namespace hiveRegressionForest
 		void __dumpAllTreeNodes(std::vector<const CNode*>& voAllTreeNodes) const;
 		void __updateFeaturesWeight(IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsLiveUpdating, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<float>& voFeaturesWeight);
 		void __sortFeatureResponsePairSet();
+		void __generateSortedFeatureResponsePairSet(const std::vector<std::vector<float>>& vFeatureSet, const std::vector<float>& vResponseSet, unsigned int vFeatureIndex, std::vector<std::pair<float, float>>& voSortedFeatureResponseSet);
 
 		CNode*       __createNode(unsigned int vLevel);
 		boost::any   __getTerminateConditionExtraParameter(const CNode* vNode);

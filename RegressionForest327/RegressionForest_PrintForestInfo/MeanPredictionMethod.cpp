@@ -15,7 +15,7 @@ float CMeanPredictionMethod::predictCertainResponseV(const std::vector<float>& v
 	std::vector<float> PredictValueOfTree(TreeNumber, 0.0f);
 	std::vector<float> NodeWeight(TreeNumber, 0.0f);
 	static std::vector<const CNode*> LeafNodeSet(TreeNumber);
-
+#pragma omp parallel for
 	for (int i = 0; i < TreeNumber; ++i)
 	{
 		LeafNodeSet[i] = vTreeSet[i]->locateLeafNode(vTestFeatureInstance);

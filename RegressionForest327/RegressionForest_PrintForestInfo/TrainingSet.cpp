@@ -11,7 +11,6 @@
 #include "TrainingSetConfig.h"
 #include "TrainingSetCommon.h"
 #include "BaseBootstrapSelector.h"
-#include "BaseInstanceWeightMethod.h"
 
 using namespace hiveRegressionForest;
 
