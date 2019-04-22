@@ -32,7 +32,7 @@
 *.out
 *.app
 
-# CSV¡¢TXT¡¢XLSX file
+# CSVï¿½ï¿½TXTï¿½ï¿½XLSX file
 # *.CSV
 # *.TXT
 *.XLSX
@@ -52,3 +52,4 @@
 *.opensdf
 *.MODEL
 *.csv
+*.~$lock
