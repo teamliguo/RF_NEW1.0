@@ -50,3 +50,5 @@
 *.VC.VC.opendb
 *.sdf
 *.opensdf
+*.MODEL
+*.csv

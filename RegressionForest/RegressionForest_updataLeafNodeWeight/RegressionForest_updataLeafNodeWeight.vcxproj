@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{32EC1967-2828-4A19-B051-01AB82EE4E28}</ProjectGuid>
+    <RootNamespace>RegressionForest</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>hiveRegressionForest-vc140</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>hiveRegressionForest-vc140D</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>hiveRegressionForest-vc140D</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>hiveRegressionForest-vc140</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(BOOST);$(HIVE_ROOT)/include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4267;4018;4819;</DisableSpecificWarnings>
+      <PreprocessorDefinitions>DEBUG;REGRESSION_FOREST_DLL_EXPORTS;_SCL_SECURE_NO_WARNINGS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(BOOST)\x86;$(HIVE_ROOT)/lib/x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>HiveOO-vc140D.lib;HiveConfiguration-vc140D.lib;HiveCommon-vc140D.lib;hiveRandom-vc140D.lib;hiveRegressionAnalysis-vc140D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>DEBUG;REGRESSION_FOREST_DLL_EXPORTS;_SCL_SECURE_NO_WARNINGS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST);$(HIVE_ROOT)/include;</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4267;4018;4819;</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(BOOST)/x64;$(HIVE_ROOT)/lib/x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>HiveOO-vc140D.lib;HiveConfiguration-vc140D.lib;HiveCommon-vc140D.lib;hiveRandom-vc140D.lib;hiveRegressionAnalysis-vc140D.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>
+      </StackReserveSize>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(BOOST);$(HIVE_ROOT)/include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4267;4018;4819;</DisableSpecificWarnings>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <PreprocessorDefinitions>REGRESSION_FOREST_DLL_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>hiveOO-vc140.lib;hiveCommon-vc140.lib;hiveConfiguration-vc140.lib;hiveRandom-vc140.lib;hiveRegressionAnalysis-vc140.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST)\x86;$(HIVE_ROOT)/lib/x86;../release;</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDLL;REGRESSION_FOREST_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST);$(HIVE_ROOT)/include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4267;4018;4819</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(BOOST)/x64;$(HIVE_ROOT)/lib/x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>HiveOO-vc140.lib;HiveConfiguration-vc140.lib;hiveCommon-vc140.lib;hiveRandom-vc140.lib;hiveRegressionAnalysis-vc140.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseBootstrapSelector.h" />
+    <ClInclude Include="BaseFeatureSelector.h" />
+    <ClInclude Include="BaseFeatureWeightMethod.h" />
+    <ClInclude Include="BaseInstanceWeightMethod.h" />
+    <ClInclude Include="BasePredictionMethod.h" />
+    <ClInclude Include="BaseSplitMethod.h" />
+    <ClInclude Include="BaseTerminateCondition.h" />
+    <ClInclude Include="BasicCondition.h" />
+    <ClInclude Include="FeatureWeightVIMethod.h" />
+    <ClInclude Include="InternalNodePredictionMethod.h" />
+    <ClInclude Include="LeafNodeWeightPredictionMethod.h" />
+    <ClInclude Include="LPPredictionMethod.h" />
+    <ClInclude Include="MeanPredictionMethod.h" />
+    <ClInclude Include="MpCompute.h" />
+    <ClInclude Include="MPPredictionMethod.h" />
+    <ClInclude Include="MultiInfoGainSplit.h" />
+    <ClInclude Include="MultiResponseNode.h" />
+    <ClInclude Include="EarlyFittingCondition.h" />
+    <ClInclude Include="FeatureWeightInvokingTreeMethod.h" />
+    <ClInclude Include="FeatureWeightPearsonMethod.h" />
+    <ClInclude Include="FeatureWeightRSSMethod.h" />
+    <ClInclude Include="InstanceWeightResponsetMethod.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="InfoGainMethod.h" />
+    <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="RegressionForest.h" />
+    <ClInclude Include="RegressionForestCommon.h" />
+    <ClInclude Include="RegressionForestConfig.h" />
+    <ClInclude Include="RegressionForestInterface.h" />
+    <ClInclude Include="RegressionForest_EXPORTS.h" />
+    <ClInclude Include="RegressionForestPool.h" />
+    <ClInclude Include="RSSMethod.h" />
+    <ClInclude Include="SingleResponseNode.h" />
+    <ClInclude Include="TrainingSet.h" />
+    <ClInclude Include="TrainingSetCommon.h" />
+    <ClInclude Include="TrainingSetConfig.h" />
+    <ClInclude Include="Tree.h" />
+    <ClInclude Include="UniformBootstrapSelector.h" />
+    <ClInclude Include="UniformFeatureSelector.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="VariancePredictionMethod.h" />
+    <ClInclude Include="WeightedBootstrapSelector.h" />
+    <ClInclude Include="WeightedFeatureSelector.h" />
+    <ClInclude Include="PathNodeMethod.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaseFeatureSelector.cpp" />
+    <ClCompile Include="BaseSplitMethod.cpp" />
+    <ClCompile Include="BasicCondition.cpp" />
+    <ClCompile Include="EarlyFittingCondition.cpp" />
+    <ClCompile Include="FeatureWeightInvokingTreeMethod.cpp" />
+    <ClCompile Include="FeatureWeightPearsonMethod.cpp" />
+    <ClCompile Include="FeatureWeightRSSMethod.cpp" />
+    <ClCompile Include="FeatureWeightVIMethod.cpp" />
+    <ClCompile Include="InstanceWeightResponseMethod.cpp" />
+    <ClCompile Include="InternalNodePredictionMethod.cpp" />
+    <ClCompile Include="LPPredictionMethod.cpp" />
+    <ClCompile Include="MeanPredictionMethod.cpp" />
+    <ClCompile Include="MpCompute.cpp" />
+    <ClCompile Include="MPPredictionMethod.cpp" />
+    <ClCompile Include="MultiInfoGainSplit.cpp" />
+    <ClCompile Include="MultiResponseNode.cpp" />
+    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="InfoGainMethod.cpp" />
+    <ClCompile Include="RegressionForest.cpp" />
+    <ClCompile Include="RegressionForestConfig.cpp" />
+    <ClCompile Include="RegressionForestInterface.cpp" />
+    <ClCompile Include="RegressionForestPool.cpp" />
+    <ClCompile Include="RSSMethod.cpp" />
+    <ClCompile Include="SingleResponseNode.cpp" />
+    <ClCompile Include="TrainingSet.cpp" />
+    <ClCompile Include="TrainingSetConfig.cpp" />
+    <ClCompile Include="Tree.cpp" />
+    <ClCompile Include="UniformBootstrapSelector.cpp" />
+    <ClCompile Include="UniformFeatureSelector.cpp" />
+    <ClCompile Include="LeafNodeWeightPredictionMethod.cpp" />
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="VariancePredictionMethod.cpp" />
+    <ClCompile Include="WeightedBootstrapSelector.cpp" />
+    <ClCompile Include="WeightedFeatureSelector.cpp" />
+    <ClCompile Include="PathNodeMethod.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
