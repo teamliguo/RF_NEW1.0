@@ -33,6 +33,8 @@ namespace hiveRegressionForest
 		void					setBootstrapIndex(std::vector<int>& vBootstrapIndex) { m_BootstrapIndex = vBootstrapIndex; }
 		float					predict(const CNode& vCurLeafNode, const std::vector<float>& vFeatures, float& voWeight, unsigned int vResponseIndex = 0) const;
 		const CNode*			locateLeafNode(const std::vector<float>& vFeatures) const;
+		void					updateUnusedNodeWeight();
+
 		const CNode&			getRoot() const { return *m_pRoot; }
 		const std::vector<int>& getOOBIndexSet() const { _ASSERTE(!m_OOBIndexSet.empty()); return m_OOBIndexSet; }
 		const std::vector<int>&	getBootstrapIndex() const { return m_BootstrapIndex; }
@@ -50,6 +52,7 @@ namespace hiveRegressionForest
 		void __initTreeParameters(IBootstrapSelector* vBootstrapSelector, std::vector<int>& voBootstrapIndex);
 		void __obtainOOBIndex(std::vector<int>& vBootStrapIndexSet);
 		void __dumpAllTreeNodes(std::vector<const CNode*>& voAllTreeNodes) const;
+		void __dumpAllLeafNodes(std::vector<const CNode*>& voAllLeafNodes) const;
 		void __updateFeaturesWeight(IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsLiveUpdating, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<float>& voFeaturesWeight);
 		void __sortFeatureResponsePairSet();
 		void __generateSortedFeatureResponsePairSet(const std::vector<std::vector<float>>& vFeatureSet, const std::vector<float>& vResponseSet, unsigned int vFeatureIndex, std::vector<std::pair<float, float>>& voSortedFeatureResponseSet);

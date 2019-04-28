@@ -72,10 +72,11 @@ void main()
 		_ASSERTE(IsDataLoaded);
 
 		_LOG_("Parsing Test Set...");
-		std::vector<std::vector<float>> TestFeatureSet;
-		std::vector<float> TestResponseSet;
+		std::vector<std::vector<float>> TestFeatureSet, OOBFeatureSet;
+		std::vector<float> TestResponseSet, OOBResponseSet;
 		const std::string TestSetPath = CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::TESTSET_PATH);
 		hiveParseTestSet(TestSetPath, TestFeatureSet, TestResponseSet);
+		hiveParseTestSet("../../DataSet/DivideData/17D_OOB_0.csv", OOBFeatureSet, OOBResponseSet);
 
 		bool IsNormalize = CTrainingSetConfig::getInstance()->getAttribute<bool>(hiveRegressionForest::KEY_WORDS::IS_NORMALIZE);
 		if (IsNormalize)
@@ -102,6 +103,12 @@ void main()
 				_LOG_("SerializeRF Finished.");
 			}
 		}
+
+		_LOG_("PrePredict...");
+		clock_t PrePredictStart = clock();
+		hiveRegressionForest::hivePrePredict(OOBFeatureSet, OOBResponseSet, ForestId);
+		clock_t PrePredictEnd = clock();
+		_LOG_("PrePredict Finished in " + std::to_string(PrePredictEnd - PrePredictStart) + " milliseconds.");
 
 		_LOG_("Predict...");
 		std::vector<float> PredictSet(TestFeatureSet.size(), 0.0f);
@@ -155,7 +162,7 @@ void main()
 		std::cout << "MSE " << MSE << std::endl;
 		std::cout << "R2Score " << R2Score << std::endl;
 
-		std::ofstream StatisticalResultFile(CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::STATISTICAL_RESULT_PATH));
+		std::ofstream StatisticalResultFile(CExtraConfig::getInstance()->getAttribute<std::string>(hiveRegressionForestExtra::KEY_WORDS::STATISTICAL_RESULT_PATH), std::ios::app);
 		_ASSERTE(StatisticalResultFile.is_open());
 		StatisticalResultFile << "Max bias rate: " << MaxBiasRate << std::endl;
 		StatisticalResultFile << "Sum bias rate: " << SumBiasRate << std::endl;

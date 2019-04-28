@@ -26,6 +26,7 @@ namespace hiveRegressionForest
 		float           calculateNodeWeight(unsigned int vResponseIndex = 0) const;
 		bool			operator==(const CNode& vNode) const;
 		bool			isLeafNode() const { return m_IsLeafNode; }
+		bool			isUsed() const { return m_IsUsed; };
 		bool			isUnfitted() const;
 		void            calFeatureRange(const std::vector<std::vector<float>>& vFeatureSet, std::pair<std::vector<float>, std::vector<float>>& voFeatureRange);
 
@@ -35,6 +36,7 @@ namespace hiveRegressionForest
 		void			setNodeSize(unsigned int vNodeSize) { m_NodeSize = vNodeSize; }
 		void			setBestSplitFeatureAndGap(unsigned int vFeatureIndex, float vGap) { m_BestSplitFeatureIndex = vFeatureIndex; m_BestGap = vGap; }
 		void            setLeafNodeWeight(float vNodeWeight) { m_NodeWeight = vNodeWeight; }
+		void			setIsUsed(bool vIsUsed) { m_IsUsed = vIsUsed; }
 
 		unsigned int	getLevel()					const { return m_Level; }
 		unsigned int	getNodeSize()				const { return m_NodeSize; }
@@ -48,6 +50,7 @@ namespace hiveRegressionForest
 
 	protected:
 		bool             m_IsLeafNode = false;
+		bool             m_IsUsed = false;
 		float            m_NodeWeight = 0.f;
 		float            m_BestGap = FLT_MAX;
 		unsigned int     m_Level = 0;
@@ -63,6 +66,7 @@ namespace hiveRegressionForest
 		void serialize(Archive & ar, const unsigned int version)
 		{
 			ar & m_IsLeafNode;
+			ar & m_IsUsed;
 			ar & m_NodeWeight;
 			ar & m_Level;
 			ar & m_BestSplitFeatureIndex;

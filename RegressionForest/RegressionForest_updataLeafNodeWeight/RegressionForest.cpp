@@ -90,6 +90,21 @@ void CRegressionForest::predict(const std::vector<std::vector<float>>& vTestFeat
 		BiasRatio.push_back(abs(voPredictSet[i] - vTestResponseSet[i]) / vTestResponseSet[i] * 100.f);
 	}
 	std::cout << "Æ½¾ùÆ«²îÂÊ = " << mean(BiasRatio) << "%" << std::endl;
+	std::ofstream StatisticalResultFile("./statistical_result.txt");
+	StatisticalResultFile << mean(BiasRatio) << std::endl;
+	StatisticalResultFile.close();
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CRegressionForest::prePredict(const std::vector<std::vector<float>>& vOOBFeatureSet, const std::vector<float>& vOOBResponseSet) const
+{
+	_ASSERTE(!vOOBFeatureSet.empty() && !vOOBResponseSet.empty());
+	std::string PredictionMethodSig = CRegressionForestConfig::getInstance()->getAttribute<std::string>(KEY_WORDS::PREDICTION_METHOD);
+	IBasePredictionMethod* pPredictionMethod = dynamic_cast<IBasePredictionMethod*>(hiveOO::CProductFactoryData::getInstance()->createProduct(PredictionMethodSig));
+	_ASSERTE(pPredictionMethod);
+	std::vector<CTree*> TreeSet = getTreeSet();
+	pPredictionMethod->prePredictOOBDataV(vOOBFeatureSet, vOOBResponseSet, TreeSet);
 }
 
 //****************************************************************************************************

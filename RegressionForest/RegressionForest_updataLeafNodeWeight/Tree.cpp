@@ -248,6 +248,24 @@ void CTree::__dumpAllTreeNodes(std::vector<const CNode*>& voAllTreeNodes) const
 
 //****************************************************************************************************
 //FUNCTION:
+void CTree::__dumpAllLeafNodes(std::vector<const CNode*>& voAllLeafNodes) const
+{
+	std::queue<const CNode*> q;
+	q.push(m_pRoot);
+
+	while (!q.empty())
+	{
+		const CNode* pTempNode = q.front();
+		if (pTempNode->isLeafNode())
+			voAllLeafNodes.push_back(q.front());
+		q.pop();
+		if (&pTempNode->getLeftChild()) q.push(&pTempNode->getLeftChild());
+		if (&pTempNode->getRightChild()) q.push(&pTempNode->getRightChild());
+	}
+}
+
+//****************************************************************************************************
+//FUNCTION:
 void CTree::__updateFeaturesWeight(IFeatureWeightGenerator* vFeatureWeightMethod, bool vIsLiveUpdating, const std::pair<std::vector<std::vector<float>>, std::vector<float>>& vBootstrapDataset, std::vector<float>& voFeaturesWeight)
 {
 	if (!vIsLiveUpdating && vBootstrapDataset.first.size() != CTrainingSet::getInstance()->getNumOfInstances()) return;
@@ -316,5 +334,32 @@ const CNode* CTree::locateLeafNode(const std::vector<float>& vFeatures) const
 			NodeStack.push(&pCurrNode->getLeftChild());
 		else
 			NodeStack.push(&pCurrNode->getRightChild());
+	}
+}
+
+//****************************************************************************************************
+//FUNCTION:
+void CTree::updateUnusedNodeWeight()
+{
+	std::vector<const CNode*> LeafNodeSet;
+	__dumpAllLeafNodes(LeafNodeSet);
+	float SumUsedNodeWeight = 0.f;
+	int UsedNodeCount = 0;
+	for (int i = 0; i < LeafNodeSet.size(); ++i)
+	{
+		if (LeafNodeSet[i]->isUsed())
+		{
+			SumUsedNodeWeight += LeafNodeSet[i]->getNodeWeight();
+			UsedNodeCount++;
+		}
+	}
+	_ASSERTE(UsedNodeCount > 0);
+	float MeamWeight = SumUsedNodeWeight / UsedNodeCount;
+	for (int i = 0; i < LeafNodeSet.size(); ++i)
+	{
+		if (!LeafNodeSet[i]->isUsed())
+		{
+			const_cast<CNode*>(LeafNodeSet[i])->setLeafNodeWeight(MeamWeight);
+		}
 	}
 }

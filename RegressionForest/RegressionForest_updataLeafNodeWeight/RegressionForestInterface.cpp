@@ -55,6 +55,18 @@ void hiveRegressionForest::hivePredict(const std::vector<std::vector<float>>& vT
 }
 
 //****************************************************************************************************
+//FUNCTION:
+void hiveRegressionForest::hivePrePredict(const std::vector<std::vector<float>>& vOOBFeatureSet, const std::vector<float>& vOOBResponseSet, unsigned int vForestId)
+{
+	_ASSERT(!vOOBFeatureSet.empty() && !vOOBResponseSet.empty());
+
+	const CRegressionForest* pRegressionForest = CRegressionForestPool::getInstance()->fetchForest(vForestId);
+	_ASSERTE(pRegressionForest);
+
+	pRegressionForest->prePredict(vOOBFeatureSet, vOOBResponseSet);
+}
+
+//****************************************************************************************************
 //FUNCTION:  for multiple response
 void hiveRegressionForest::hivePredict(const std::vector<float>& vTestInstance, unsigned int vForestId, unsigned int vNumResponse, std::vector<float>& voPredictValue, bool vIsWeightedPrediction /*= true*/)
 {
