@@ -1,4 +1,4 @@
-# Prerequisites
+﻿# Prerequisites
 *.d
 
 # Compiled Object files
@@ -32,7 +32,7 @@
 *.out
 *.app
 
-# CSV��TXT��XLSX file
+
 # *.CSV
 # *.TXT
 *.XLSX
@@ -53,3 +53,5 @@
 *.MODEL
 *.csv
 *.~$lock
+*.xls
+*.xml

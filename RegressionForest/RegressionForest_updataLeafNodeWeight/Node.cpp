@@ -78,10 +78,21 @@ void CNode::calFeatureRange(const std::vector<std::vector<float>>& vFeatureSet, 
 			Column[k] = vFeatureSet[k][i];
 		float max = *std::max_element(Column.begin(), Column.end());
 		float min = *std::min_element(Column.begin(), Column.end());
-		MinFeature.push_back(min);
-		MaxFeature.push_back(max);
+		MinFeature.push_back(std::move(min));
+		MaxFeature.push_back(std::move(max));
 	}
-	voFeatureRange = std::make_pair(MinFeature, MaxFeature);
+	voFeatureRange = std::make_pair(std::move(MinFeature), std::move(MaxFeature));
+}
+
+//******************************************************************************
+//FUNCTION:
+void hiveRegressionForest::CNode::updataFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vParentRange, int vFeatureIndex, float vSplitLocaiton, bool vIsMin)
+{
+	m_SplitRange = vParentRange;
+	if (vIsMin)
+		m_SplitRange.second[vFeatureIndex] = vSplitLocaiton;
+	else
+		m_SplitRange.first[vFeatureIndex] = vSplitLocaiton;
 }
 
 //****************************************************************************************************

@@ -76,7 +76,8 @@ void main()
 		std::vector<float> TestResponseSet, OOBResponseSet;
 		const std::string TestSetPath = CTrainingSetConfig::getInstance()->getAttribute<std::string>(hiveRegressionForest::KEY_WORDS::TESTSET_PATH);
 		hiveParseTestSet(TestSetPath, TestFeatureSet, TestResponseSet);
-		hiveParseTestSet("../../DataSet/DivideData/17D_OOB_0.csv", OOBFeatureSet, OOBResponseSet);
+		//hiveParseTestSet(TestSetPath, OOBFeatureSet, OOBResponseSet);
+		hiveParseTestSet("../../DataSet/17D_OOB_0.csv", OOBFeatureSet, OOBResponseSet);
 
 		bool IsNormalize = CTrainingSetConfig::getInstance()->getAttribute<bool>(hiveRegressionForest::KEY_WORDS::IS_NORMALIZE);
 		if (IsNormalize)

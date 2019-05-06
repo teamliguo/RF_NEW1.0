@@ -41,6 +41,7 @@ void CTree::buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* 
 
 	CTrainingSet::getInstance()->recombineBootstrapDataset(BootstrapIndex, NodeBootstrapRangeStack.top().second, BootstrapDataset);
 	m_pRoot->calStatisticsV(BootstrapDataset);
+	m_pRoot->setEachFeatureSplitRange(m_pRoot->getFeatureRange());
 	setBootstrapIndex(BootstrapIndex);
 	__sortFeatureResponsePairSet();
 	int RangeSplitPos = 0;
@@ -77,8 +78,10 @@ void CTree::buildTree(IBootstrapSelector* vBootstrapSelector, IFeatureSelector* 
 				NodeBootstrapRangeStack.push(std::make_pair(pLeftNode, std::pair<int, int>(CurBootstrapRange.first, RangeSplitPos)));
 				NodeBootstrapRangeStack.push(std::make_pair(pRightNode, std::pair<int, int>(RangeSplitPos, CurBootstrapRange.second)));
 				CTrainingSet::getInstance()->recombineBootstrapDataset(BootstrapIndex, std::pair<int, int>(CurBootstrapRange.first, RangeSplitPos), BootstrapDataset);
+				pLeftNode->updataFeatureSplitRange(pCurNode->getFeatureSplitRange(), pCurNode->getBestSplitFeatureIndex(), pCurNode->getBestGap(), true);
 				pLeftNode->calStatisticsV(BootstrapDataset);
 				CTrainingSet::getInstance()->recombineBootstrapDataset(BootstrapIndex, std::pair<int, int>(RangeSplitPos, CurBootstrapRange.second), BootstrapDataset);
+				pRightNode->updataFeatureSplitRange(pCurNode->getFeatureSplitRange(), pCurNode->getBestSplitFeatureIndex(), pCurNode->getBestGap(), false);
 				pRightNode->calStatisticsV(BootstrapDataset);
 				pCurNode->setLeftChild(pLeftNode);
 				pCurNode->setRightChild(pRightNode);
@@ -354,12 +357,12 @@ void CTree::updateUnusedNodeWeight()
 		}
 	}
 	_ASSERTE(UsedNodeCount > 0);
-	float MeamWeight = SumUsedNodeWeight / UsedNodeCount;
+	float MeanWeight = SumUsedNodeWeight / UsedNodeCount;
 	for (int i = 0; i < LeafNodeSet.size(); ++i)
 	{
 		if (!LeafNodeSet[i]->isUsed())
 		{
-			const_cast<CNode*>(LeafNodeSet[i])->setLeafNodeWeight(MeamWeight);
+			const_cast<CNode*>(LeafNodeSet[i])->setLeafNodeWeight(MeanWeight);
 		}
 	}
 }

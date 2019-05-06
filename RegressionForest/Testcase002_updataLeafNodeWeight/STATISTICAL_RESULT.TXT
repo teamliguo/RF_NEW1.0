@@ -1,24 +1,25 @@
-Max bias rate: 0.354678
-Sum bias rate: 801.729
-MSE:0.764265
-R2Score:0.727262
-Accuracy of bias < 0.5 : 0.584531
-Accuracy of bias < 1 : 0.827729
-Accuracy of bias < 1.5 : 0.921074
-Accuracy of bias < 2 : 0.954244
-Accuracy of bias < 2.5 : 0.976511
-Accuracy of bias < 3 : 0.987975
-Accuracy of bias < 3.5 : 0.994599
-Accuracy of bias < 4 : 0.997707
-Accuracy of bias < 4.5 : 0.999287
-Accuracy of bias < 5 : 0.999643
-Accuracy of bias rate < 0.01 : 0.192958
-Accuracy of bias rate < 0.02 : 0.369612
-Accuracy of bias rate < 0.03 : 0.512534
-Accuracy of bias rate < 0.04 : 0.62779
-Accuracy of bias rate < 0.05 : 0.711301
-Accuracy of bias rate < 0.06 : 0.780852
-Accuracy of bias rate < 0.07 : 0.830429
-Accuracy of bias rate < 0.08 : 0.868287
-Accuracy of bias rate < 0.09 : 0.900489
-Accuracy of bias rate < 0.1 : 0.920972
+100
+Max bias rate: 1
+Sum bias rate: 19626
+MSE:205.233
+R2Score:-72.2401
+Accuracy of bias < 0.5 : 0
+Accuracy of bias < 1 : 0
+Accuracy of bias < 1.5 : 0
+Accuracy of bias < 2 : 0
+Accuracy of bias < 2.5 : 0
+Accuracy of bias < 3 : 0
+Accuracy of bias < 3.5 : 0
+Accuracy of bias < 4 : 0
+Accuracy of bias < 4.5 : 0
+Accuracy of bias < 5 : 0
+Accuracy of bias rate < 0.01 : 0
+Accuracy of bias rate < 0.02 : 0
+Accuracy of bias rate < 0.03 : 0
+Accuracy of bias rate < 0.04 : 0
+Accuracy of bias rate < 0.05 : 0
+Accuracy of bias rate < 0.06 : 0
+Accuracy of bias rate < 0.07 : 0
+Accuracy of bias rate < 0.08 : 0
+Accuracy of bias rate < 0.09 : 0
+Accuracy of bias rate < 0.1 : 0

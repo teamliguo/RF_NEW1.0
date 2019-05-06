@@ -44,7 +44,7 @@ void CSingleResponseNode::createAsLeafNodeV(const std::pair<std::vector<std::vec
 	_ASSERTE(CTrainingSet::getInstance()->getNumOfResponse() == 1);
 
 	m_IsLeafNode = true;
-	m_NodeWeight = 1.0f;
+	setLeafNodeWeight(1.0f);
 
 	std::string LeafNodeModelSig = CRegressionForestConfig::getInstance()->getAttribute<std::string>(KEY_WORDS::LEAF_NODE_MODEL_SIGNATURE);
 	if (LeafNodeModelSig.empty()) LeafNodeModelSig = KEY_WORDS::REGRESSION_MODEL_AVERAGE;

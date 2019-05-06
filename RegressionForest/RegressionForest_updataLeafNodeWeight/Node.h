@@ -5,6 +5,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
+#include <unordered_map>
+#include <bitset>
 
 namespace hiveRegressionForest
 {
@@ -29,6 +31,7 @@ namespace hiveRegressionForest
 		bool			isUsed() const { return m_IsUsed; };
 		bool			isUnfitted() const;
 		void            calFeatureRange(const std::vector<std::vector<float>>& vFeatureSet, std::pair<std::vector<float>, std::vector<float>>& voFeatureRange);
+		void            updataFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vParentRange, int vFeatureIndex, float vSplitLocaiton, bool vIsMin);
 
 		bool			setLeftChild(CNode* vNode);
 		bool			setRightChild(CNode* vNode);
@@ -37,16 +40,20 @@ namespace hiveRegressionForest
 		void			setBestSplitFeatureAndGap(unsigned int vFeatureIndex, float vGap) { m_BestSplitFeatureIndex = vFeatureIndex; m_BestGap = vGap; }
 		void            setLeafNodeWeight(float vNodeWeight) { m_NodeWeight = vNodeWeight; }
 		void			setIsUsed(bool vIsUsed) { m_IsUsed = vIsUsed; }
+		void            setEachFeatureSplitRange(const std::pair<std::vector<float>, std::vector<float>>& vSplitRange) { m_SplitRange = vSplitRange; }
+		void            changeBlockIdWithWeight(const std::pair<std::bitset<16>, float>& vBlockIdWithWeight) { m_BlockIdWithWeight[vBlockIdWithWeight.first] = vBlockIdWithWeight.second; }
 
-		unsigned int	getLevel()					const { return m_Level; }
-		unsigned int	getNodeSize()				const { return m_NodeSize; }
 		float           getNodeWeight()             const { return m_NodeWeight; }
 		float			getBestGap()				const { return m_BestGap; }
+		unsigned int	getLevel()					const { return m_Level; }
+		unsigned int	getNodeSize()				const { return m_NodeSize; }
 		unsigned int	getBestSplitFeatureIndex()	const { return m_BestSplitFeatureIndex; }
 		const CNode&	getLeftChild()				const { return *m_pLeftChild; }
 		const CNode&	getRightChild()				const { return *m_pRightChild; }
-		const std::pair<std::vector<float>, std::vector<float>>&   getFeatureRange()  const { return m_FeatureRange; }
-		const std::vector<int>&                                    getNodeDataIndex() const { return m_DataSetIndex; }
+		const std::pair<std::vector<float>, std::vector<float>>&   getFeatureRange()      const { return m_FeatureRange; }
+		const std::pair<std::vector<float>, std::vector<float>>&   getFeatureSplitRange() const { return m_SplitRange; }
+		const std::unordered_map<std::bitset<16>, float>&          getBlockIdWithWeight() const { return m_BlockIdWithWeight; }
+		const std::vector<int>&                                    getNodeDataIndex()     const { return m_DataSetIndex; }
 
 	protected:
 		bool             m_IsLeafNode = false;
@@ -59,7 +66,9 @@ namespace hiveRegressionForest
 		CNode*           m_pLeftChild = nullptr;
 		CNode*           m_pRightChild = nullptr;
 		std::vector<int> m_DataSetIndex;
+		std::pair<std::vector<float>, std::vector<float>> m_SplitRange;
 		std::pair<std::vector<float>, std::vector<float>> m_FeatureRange;
+		std::unordered_map<std::bitset<16>, float>        m_BlockIdWithWeight;//目前将16写死了
 
 	private:
 		template <typename Archive>
@@ -74,6 +83,7 @@ namespace hiveRegressionForest
 			ar & m_NodeSize;
 			ar & m_pLeftChild;
 			ar & m_pRightChild;
+			ar & m_SplitRange;
 			ar & m_FeatureRange;
 			ar & m_DataSetIndex;
 		}
